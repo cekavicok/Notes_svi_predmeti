@@ -1,0 +1,43 @@
+QuickSort(A, low, high){
+    if(low < high){
+        j = Partition(A, low, high);
+        QuickSort(a, low, j-1);
+        QuickSort(a, j+1, high);
+    }
+}
+
+Partition(A, low, high){
+    j = low;
+    i = up;
+    pivot = a[down];
+    while(i<j){
+        dok je pivot veci od a[i] i i<j povecavam i++
+        dok je pivot manji od a[j] smanjujem j--
+        ako je i manje od j onda menjam mesta a[i] i a[j]
+    }
+    a[down] = a[j]
+    i a[j] postaje pivot 
+    return j;
+}
+
+
+
+//druga varijanta
+Partition(A, low, high){
+    pivot = A[low];
+    leftwall = low; //i u literaturi
+    //uzima na low lokaciju vrednost koja je pivot zato je preskacem u for
+    for(int i=low+1; i<=high; i++){
+        if(A[i] < pivot){
+            swap(A[i] and A[leftwall]);
+            leftwall = leftwall+1
+        }
+    }
+    swap(pivot, A[leftwall]);
+    return leftwall;
+}
+
+
+Performanske: O(n logn) - O(n^2) / prosek: O(n logn)
+Mem: O(n logn)
+

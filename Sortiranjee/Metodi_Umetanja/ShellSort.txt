@@ -1,0 +1,23 @@
+Shell_Sort(array, n){
+    gap = n/2; 
+    //npr moze biti i dat u listi gap kao u knizi niz h
+    //i ja sad prodjem od i=0 do len(h) i za svako h[i] sortiram
+    while(gap>0){
+        for(int i=gap; i<n-1; i++){
+            temp = array[i];
+            j=i
+            while(j>=gap && array[j - gap] > temp){
+                 array[j] = array[j - gap]
+                j = j - gap
+            }
+            array[j] = temp
+        }
+        gap = gap / 2
+    }
+}
+
+Performanse: idk 
+Mem: O(1)
+
+
+

@@ -1,0 +1,7 @@
+Gledam svaki broj kao binarnu reprezentaciju
+i = 0, j=n
+i ide dok ne nadje broj gde je bit najvece tezine = 1
+j radi isto samo trazi 0 i onda se swapuju 
+nakon toga su se napravile dve particije koje se zasebno rade tj rekurzivan je algoritam
+
+

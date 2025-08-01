@@ -1,0 +1,73 @@
+BST SORT
+----------------------------------
+Problem istih kljuceva se resava: 1) umetanjem kao sledbenika tj u desno pa skroz levo
+                                2) ulancavanjem
+Pravi se binarno stablo pa se prelazi inorder obilaskom and thats it
+Slozenost: O(n logn) - O(n^2) Prosecna je O(n logn)
+Mem: O(n)
+
+Stablo selekcije
+--------------------------------------
+Postavim ceo niz kao listove i onda stavljam veci od svaka dva ka gore dok ne dobijem root
+Kad sam dobio root uklonim ga i update od uklonjenog mesta do root-a. Ponavljam ovo dok ne izbacim
+sve i dobicu max 
+
+Mana: mnogo nepotrebnih vrednosti -INFINITE svuda gde sam trebao da izbacim da bi uvek bili manji lol
+
+
+HeapSort
+-----------------------------------
+Funkcionise slicno stablu selekcije
+Inicijalno pravim heap(binarno stablo gde je najveci element koren) i potom odrzavam skidam root i 
+radim funkciju za odrzavanje heap-a i ponavljam proces. 
+
+Mogu da predstavim head kao bin stablo u originalnom nizu pa se ne koristi dodatna memorija
+-Levi potomak je X*2
+-Desni potomak je X*2 + 1
+-Roditelj cvora X se dobija kao X/2 
+-Koren stabla je najmanji indeks
+PONAVLJAM OVO NAKON STO NAPRAVIM HEAP
+-Zamenim prvi i zadnji element
+-Gledam da zamenim prvi sa vecim od svojih sinova sve dok nije veci od oba sina 
+
+
+
+Slozenost: O(n logn) u svim slucajevima lol
+HEAPSORT NIJE STABILAN ALGORITAM to mu je najveca mana
+
+Primenom rekurzije
+HeapSort(A, n){
+    BuildHeap(A, n);
+    int temp;
+    for(int i=n-1; i>0; i--){
+        temp = A[i];
+        A[i] = A[0];
+        A[0] = temp;
+        Adjust(A, 0);
+    }
+}
+
+BuildHeap(A, n){
+    for(int i = n/2; i>0; i--){
+        Adjust(A, i);
+    }
+}
+
+Adjust(array A, int i){
+    int max, temp, left, right;
+    left = 2i;
+    right = 2i + 1;
+    if(left <= n && A[left] > A[i]){
+        max = left;
+    } 
+    else max = i;
+    if(right<=n && A[right] > A[max]){
+        max = right;
+    } 
+    if(max!=i){
+        temp = A[right];
+        A[right] = A[i];
+        A[i] = temp;
+        Adjust(A, max);       
+    }
+}

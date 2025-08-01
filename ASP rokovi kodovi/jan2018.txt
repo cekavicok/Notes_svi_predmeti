@@ -1,0 +1,38 @@
+//vrsi transpoziciju kada nadje kljuc ali kada se ponovi najgori slucaj k puta izvrsi jednom prebacivanje na pocetak
+//nkeys je broj kljuceva mislim
+
+Zadatak 1 pod b
+COMP_SEARCH_MUL(arr, n, k, keys, nkeys){
+    int br=0;
+    int* pozicija = malloc(keys*sizeof(int));
+    for(int i=0; i<nkeys; i++){
+        pozicija[i] = 0;
+    }
+    for(int i=0; i<nkeys; i++){
+        kljuc = keys[i];
+        for(int j=0; j<n; j++){
+            if(kljuc == arr[j] && ){
+                //ovde vrsim prebacivanje na pocetak
+                if(br == k){
+                    for(int p=1; p<j; p++){
+                        arr[p+1] = arr[p];
+                    }
+                    arr[0] = kljuc;
+                    br = 0;
+                }
+                //transpozicija i brojanje u slucaju da je najgori slucaj
+                else{
+                    if(j = n) br++;
+                    else br = 0;
+                    arr[j] = arr[j-1];
+                    arr[j-1] = kljuc;  
+                }
+                pozicija[i] = j; 
+            } 
+        }
+
+    }
+    return pozicija;
+}
+
+

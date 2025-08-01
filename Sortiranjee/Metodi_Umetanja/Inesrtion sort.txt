@@ -1,0 +1,15 @@
+INSERTION_SORT(A){
+    for(int i=1; i < len(a); i++){
+        j = i;
+        while(j>0 && A[i-1] > A[i]){
+            int temp = A[i-1];
+            A[i-1] = A[i];
+            A[i] = temp;
+            j--;
+        }
+    }
+}
+
+
+Performanse: O(n) - O(n^2)
+Mem: O(1)

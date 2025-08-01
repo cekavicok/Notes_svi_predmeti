@@ -1,0 +1,220 @@
+Prva dva predavanja su na papiru; mozda prekucam :) 
+
+Predavanje 3
+_______________________________________________________________________________________________________________
+=> Adresiranje podataka
+->Immediate address mode ili neposredan nacin adresiranja | load r1, #1 
+->Registarsko direktano nacin adresiranja | load r0, b 
+->Registarsko indirektno adresiranje (cita sa lokacija na kojoj je podatak iz registra)| load r1, [r0] 
+->Registarsko indirektno adresiranje sa pomeranjem (cita podatak sa (adresa u registru + pomeraj)) | load r0, [a+r2]
+koristi se za npr pristup el niza ili clanovima strukture
+->Staticki podaci
+; static int a=0, b=1;
+a dd 0
+b dd 0xffffffff
+; static char c = '0', *p = nullptr;
+c db 0x30
+p dd 0
+; db (define byte - za char, moze i string),  dw (define word), dd (define double word 32 ili 64 bita valjda)
+
+ovim podacima pristupam memdir adresiranjem npr.
+load r1, a
+store r1, b
+; a = b
+
+->Lokalni podaci potprograma (funkcije lol)
+primer potprograma:
+int max(int a, int b){
+    return (a>=b) ?a:b;
+}
+
+Implementacija:
+
+max::return dd ?
+max::a dd ?
+max::b dd ?
+
+max:    load r0,max::a
+        load r1,max::b 
+        cmp r0,r1
+        jnge L001
+        store r0,max::return
+L001:   store r1,max::return
+poziv:
+;z = max(x,y)
+store r0,max::a
+store r1,max::b
+...poziv potprograma
+load r2, max::return
+
+PROBLEM KOD OVOGA JE REKURZIJA koja nije podrzana 
+
+Znaci samo normalno stavim sve podatke koje cu koristiti u fji u stek 
+-push, pop fje
+-SP stek pointer 
+->stek raste ka visim ili nizim vrednostima i moze ukazivati na poslednju popunjenu i prvu slobodnu lokaciju
+
+-Push nije sistemski podrzan(koristim r15 za sp npr):
+inc r15
+storeb r0, [r15]
+-Pop nije sistemski podrzan(popujem 32b npr):
+load r0, r[15]
+dec r15 (cetiri puta)
+
+-> Zastita od gresaka 
+npr izlazak iz okvira niza (out of bounds)
+___________________________________________________________________________________
+=>Adresiranje instrukcija
+
+->Relativno adresiranje, po pravilu u odnosu na tekucu vrednost PC:
+
+loop: ...
+        jmp loop
+
+instrukcija skoka koristi reg indirektno adresiranje sa pomerajem u odnosu na PC;
+pomeraj se racuna za vreme prevodjenja(& je duzina trenutne instrukcija):
+dest - ($ + &)
+deo koda je relokatibilan
+
+->Poziv potprograma: bezuslovan skok na tu instrukciju (apsolutno ili relativno adresiranje)
+->Povratak iz potprograma: mora se odrediti dinamicki:
+indirekti skok (cuva se lokacija PC registra na stek)
+pored PC registra stavlja se i vrednost PSW registra
+Ovo se izvrsava automatski kako ne bi programer vodio racuna o tome ali ne obavezno u svim asemlerima
+
+->Funkciju mogu da pozovem i indirektno preko pokazivaca kao u c:
+unsigned (*p)(unsigned) = factorial;
+...
+(*p)(m);
+
+Pr u asembleru:
+    load r0, m
+    push r0
+    load r0, p
+    call [r0]
+    pop r1 // idk sta je r1 ovde lol
+
+->Opet jako bitna zastita o kojoj ce se pricati posle
+___________________________________________________________________________________
+=>Prevodjenje (compiler)
+program koji prevodi tekstualni zapis iz izvornog programa na visem prog jeziku(C/C++ npr.) u binarni, masinski zapis
+
+Program na C/C++ sastoji se od jednog ili vise modula(fajlova), i svaki od tih fajlova se prevodi potpuno odvojeno(compilation unit)
+Kada prevede jedan fajl prevodilac generise fajl sa prevedenim kodom - object file(.obj ili .o fajlovi)
+Greska u prevodjeno uzrokujem ne proizvodjenja obj fajla
+
+->Prevodilac prvo vrsi leksicku analizu i grupise znakove u tokene, redom karakter po karakter po pravilima jezika
+->Parsiranje(parsing): prepoznavanje recenica gramatike jezika
+
+->Kada naidje na novu deklaraciju, prevodilac dodaje deklarisani identifikator u tabelu simbola(symbol table):
+Kada naidje na postojeci proverava:
+Da li je taj indentifikator deklarisan i da li je dostupan
+Da li je indf upotrebljen u skladu sa pravilima jezika
+Ako je definisan semantikom jezika(npr neka vec postojeca metoda), generise kod za upotebu tog indentifikatora u odgovarajucem
+kontekstu
+->Imena sa spoljasnjim vezivanjem (external linking) cuvaju se u tabeli izvezenih simbola (pr od * dole)
+u tabeli se cuva infomacija o imenu simbola i relativnoj adresi u odnosu na pocetak binarnog prevoda
+->Kad deklarisem static int n; on se interno vezuje(internal linking) i ne moze se koristiti u drugim fajlovima
+Npr:
+int n = -16;
+void f () {
+    ++n;
+}
+ide u 
+*
+symbols
+    "n": n
+    "f": f
+end symbols
+*
+n:  dd 0xfffffff0
+
+f:  load r1, n
+    inc r1
+    store r1, n
+    ret
+
+->extern int n; kada zelim da koristim konstantu ili metodu iz nekog drugog fajla, prazno telo metode je takodje extern tkd
+extern nije obavezno napisati
+compiler ce ostaviti nerazresen masinski kod na mestima gde sam hteo da pozovem fju ili staticki objekat, ali se u tabeli nalazi
+podataka gde ce da se nadju njihove definicije
+
+->Jezici C/C++ dozvoljavaju da se pise asemblerski kod direktno pomocu asm:
+
+void f(int x, int y)
+extern static int x;
+
+void g(int y) {
+    asm(
+        load r0, y
+        push r0
+        load r0,x
+        push r0
+        call f
+    );
+}
+___________________________________________________________________________________
+=>Povezivac (linker)
+Zadaje mu se spisak ulaznih objektnih(.obj) fajlova i ima zadatak da napravi izvrsivi (.exe) fajl kao svoj izlaz
+
+Linker obavlja svoj posao u dva prolaza:
+1) analizira ulazne fajlove, velicinu njihovog binarnog zapisa, pravi mapu .exe fajla, pravi svoju tabelu simbola
+od tabela simbola od fajlova koje prolazi
+2) generise binarni kod, razresava nerazresena adresna polja na osnovu tabele koju je napravio u prvom koraku
+
+->Library(.lib) vise obj fajlova koje se povezu u jedan lib fajl i onda koriste.
+vise na slajdovima lol
+
+->Linker moze da prijavi samo dve greske u toku rada:
+1) Simbol nije definisam: zab smo da definisemo ili fali neki obj ili lib fajl, neka povezana biblioteka, koja zavisi od druge,
+druga nije povezana. To su tri osnovna razloga zasto simbol nije definisan
+2)Simbol visestruko definisan: sukob imena u korisnickom programu, sukom imena korisnickog programa i imena iz biblioteke
+Zato se koristi prostor imena(namespace) da ne bi dolazilo do ovakvih gresaka
+
+.obj, .lib i .exe su binarni fajlovi
+Standardan format ELF(executable/linkable format)
+
+___________________________________________________________________________________
+Predavanje 4 - Organizacija i alokacija memorije
+___________________________________________________________________________________
+
+=>Monoprocesni sisemi
+U memoriji je samo jedan proces
+On koristi ceo RAM osim delova gde su kernel i ROM(bootstrap i BIOS)
+Program koristi fizicke adrese memorije
+
+Proces moze sam da rasporedi svoj prostor tj deli ih na logicke segmente: prog kod, staticki podaci... stek itd.
+Gde se onda alocira stek? Stek se alocira na vrhu i raste ka nizim adresama i onda moze da se siri do najvise moguce
+i stek se zaustavlja na granici za stek da ne bi pregazio podatke (granica se nalazi u nekom registaru ili softverski u nekoj lokaciji)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

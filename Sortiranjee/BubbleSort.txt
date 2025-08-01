@@ -1,0 +1,22 @@
+BubbleSort(A){
+    int p=n;
+    for(int i=1; i<n; i++){
+        int i=0;
+        while(i<p-1){
+            if(A[j]>A[j+1]){
+                SWAP(A[j] and A[j+1]);
+            }
+            i++:
+            p--:
+        }
+    }
+}
+
+Slozenost: O(n) - O(n^2)
+Mem: O(1) i stabilan je algoritam 
+
+
+Malo bolja varijanta bubblesorta ShakerSort(literatura) ili CocktailSort (internet)
+ShakerSort(){
+    
+}
