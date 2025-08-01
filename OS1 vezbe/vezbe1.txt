@@ -1,0 +1,122 @@
+=>Uvod 
+->Sistemski pozivi npr: exit, getc, putc, printf, rad sa fajlovima
+PR:
+putc('R', stdout);
+putc('\n', stdout);
+//otvaranje fajla primer
+FILE* file = fopen("random.txt", "r");
+char buff[10];
+fread(&buff, sizeof(char), 6, file);
+buff[6] = '\0';
+printf("%s", buff);
+printf("\n");
+fclose(file);
+
+=>Uvod u arhitekturu RISC-V 
+*https://www2.eecs.berkeley.edu/Pubs/TechRpts/2016/EECS-2016-118.pdf (uputstvo za risc pet)
+*https://github.com/riscv-non-isa/riscv-asm-manual/blob/main/src/asm-manual.adoc (specifikacije)
+->64-bitni 3-adresni mikroprocesor sa load/store arhitekturom sa oznakom RV64IMA
+->Adresibilna jedinica bajt: tj 8 bitova je mesto u memoriji valjda
+->Podaci mogu biti 1,2,4 ili 8 bajtova
+->Nizi bajt na nizoj mem lokaciji
+->Korisnicki i sistemski rezim rada (korisnicki tj ne privilegovan, sistemski-privilegovan, super privilegovan)
+->Registri: opstenamenski(dostupni u oba rezima) (x0 - x31)
+            sistemski
+            PC registar
+->Stek raste ka nizim adresama, sp pokazuje na poslednju zauzetu lokaciju (sp +- 16 uvek)
+
+->Registri opste namene:
+sp (x2)
+ra (registar za povratnu adresu (x1))
+s0 - s11 (cuvaju se tokom izvrsavanja funkcije, s0 je frame pointer)
+a0 - a7 (registri za prenos argumenata i povratne vrednosti potprograma, povratna vrednost a0 i a1 ili u memoriju)
+t0 - t6 (privremeni registri, ne cuvaju se prilikom poziva fje)
+zero (registar = 0, x0)
+gp i tp (global pointer i thread base pointer)
+
+->Sistemski registri (dostupni samo u privilegovanom rezimu rada):
+pristupa im se pomocuja csr(control and status register) instrukcija
+sstatus (statusni registar, slican PSW registru)
+sip i sie (registri za prekide, sip-pristigli zahtevi i sie-zabrana prekida)
+scratch (temp reg)
+sepc (cuva pc kada se desi izuzetak)
+scause (opis razloga za prelazak u sistemski rezim)
+stvec (adresa prekidne rutine poravnata na 4B, 32b)
+
+Pregled instrukcija:
+    Aritmeticke:
+        add rd, rs1, rs2
+        addi rd, rs1, imm (neposredan add)
+    Instrukcije skoka:
+        Bezuslovne:
+            (jal, jump and link)
+            j, jal (skok sa pomerajem, jal rd, offset, u rd se pice vrednost PC a skace se na PC+offset)
+            jr, jalr (skok na adresu zapisanu u registru, jalr rd, rs, offset, skace se na rs+offest a PC ide u rd)
+            call (skok na funkciju, u x1 je povratna adresa, kombinacija auipc i jalr)
+            ecall (prelazak u sistemski rezim)
+            ret, sret (povratak iz funkcije ili prekidne rutine)
+        Uslovne:
+            beq, bne, beqz, bgt...
+            beqz rs, offset (branch equal to zero, rs se poredi sa 0)
+            bgt rs, rt, offest (branch greater then, rs>rt => PC+offset)
+    Load/Store instrukcije:
+        l{b|h|w|d} rd, offset(rs) (offset + rs ide u rd)
+        s{b|h|w|d} rs, offset(rs) (rs ide u offset+rs)
+        b - bajt(1B), h - half word(2B), w - word(4B), d - double word(8B)
+    csr instrukcije:
+        csrr rd, srs (citanje sistemskog registra)
+        csrw rs, srd (upis u sistemski registar)
+        csrrw rd, sr, rs (upis uz citanje prethodne vrednosti)
+
+
+=>Prevodilac u projektnom zadatku:
+GNU gcc za RISC-V
+Nema standardnih biblioteka
+mem.h i console.h smem da koristim do nekog dela u projektu
+
+=>Asembler:
+Mogu unutar C/C++ da pisem u asembleru - asm blokovi
+    asm volatile("cssr %0, sstatus" : "=r" (x)); //x ide umesto %0
+
+    
+=>Poziv fje:
+funkcija cuva registre s0 - s11 (cuva samo koji ce se koristiti u toku izvrsavanja)
+funkcija cuva sp
+ostale opstenameske registre cuva sam pozivalac fje
+parametri se prenose preko a0 - a7 ili kroz mem (preko steka ili a0-a7 pokazuju na lokaciju na mem)
+return ide preko a0 i a1 ili kroz memoriju 
+
+primer:
+int f(int a, int b) {
+    int c;
+    c = a + b;
+    return g(c);
+}
+
+ld a1, b
+ld a0, a
+auipc ra, 0x0 //cuva PC na ra (return address) i dodaje offset
+jalr -68(ra) // ra + -(68)
+mv ..., a0 //uzimamo rezultat fje
+...
+f:
+addi sp, sp, -16
+sd ra, 8(sp) //ra smo stavili na stek za slucaj da u f pozovemo drugu fju g
+sd s0, 0(sp) //cuvamo staru vr registra s0
+addi s0, sp, 16 //s0 sada postaje gde je bio sp kad se pozvala f
+
+addw a0, a0, a1 // c = a + b
+auipc ra, 0x0
+jalr -48(ra)
+
+//vratim sve na svoje mesto kad izlazim
+ld ra, 8(sp)
+ld s0, 0(sp)
+addi sp, sp, 16
+ret
+
+
+
+
+
+
