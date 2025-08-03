@@ -106,7 +106,7 @@ sd s0, 0(sp) //cuvamo staru vr registra s0
 addi s0, sp, 16 //s0 sada postaje gde je bio sp kad se pozvala f
 
 addw a0, a0, a1 // c = a + b
-auipc ra, 0x0
+auipc ra, 0x0 //vrednost starog pc se upisuje u ra, 0x0 pomeraj
 jalr -48(ra)
 
 //vratim sve na svoje mesto kad izlazim
