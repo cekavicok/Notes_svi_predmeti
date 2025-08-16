@@ -7,7 +7,7 @@ Shell_Sort(array, n){
             temp = array[i];
             j=i
             while(j>=gap && array[j - gap] > temp){
-                 array[j] = array[j - gap]
+                array[j] = array[j - gap]
                 j = j - gap
             }
             array[j] = temp
@@ -15,7 +15,7 @@ Shell_Sort(array, n){
         gap = gap / 2
     }
 }
-
+//BUKV skroz isto kao insertion sort samo dodam gap koji menjam i imam temp
 Performanse: idk 
 Mem: O(1)
 
