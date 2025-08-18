@@ -1,13 +1,13 @@
 QuickSort(A, low, high){
     if(low < high){
         j = Partition(A, low, high);
-        QuickSort(a, low, j-1);
-        QuickSort(a, j+1, high);
+        QuickSort(A, low, j-1);
+        QuickSort(A, j+1, high);
     }
 }
 
-Partition(A, low, high){
-    j = low;
+Partition(A, down, up){
+    j = down;
     i = up;
     pivot = a[down];
     while(i<j){
