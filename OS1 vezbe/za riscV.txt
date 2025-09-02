@@ -1,0 +1,17 @@
+Prilikom poziva u prekidnu rutinu radi se sledeće:
+    Vrednost registra pc se upisuje u registar sepc
+    U registar sstatus upisuju se sledeće vrednosti
+        U bit SPP (supervisior previus privilage) (bit 8) vrednost koja pokazuje iz kog režima se dogodio skok (0 – korisnički, 1 – sistemski)
+        U bit SIE (supervisior interapt enable bit) (bit 1) nulu, čime se maskiraju spoljašnji prekidi
+        U bit SPIE (spie p je previus) (bit 5) prethodna vrednost bita 
+    U registar scause razlog skoka u prekidnu rutinu (supervisor cause)
+    Skače se na prekidnu rutinu čija je adresa (mora biti poravnata na 4 bajta) u registru stvec (supervisor trap vector)
+
+Prilikom povratka radi se sledeće:
+    Režim u koji se prelazi definisan je bitom SPP (nakon povratka postavlja se na nulu)
+    Bit SIE dobija vrednost bita SPIE
+    Vrednost registra sepc se upisuje u registar pc
+Obrada spoljašnjih prekida konzole data je u biblioteci console.lib (zaglavlje console.h)
+    console_handler()
+    Ne obuhvata nikakvo čuvanje registara
+    Omogućava rad funkcija __putc i __getc
