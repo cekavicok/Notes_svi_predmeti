@@ -1,0 +1,24 @@
+slike i sve ostalo stavljam u public folder
+
+
+Injectable znaci da na root nivou mogu da koristim ovo gde kod
+isto kao da imam public u javi
+
+
+@for(writer of allWriters; track writer.firstname)
+for petlja i guess
+
+
+
+Pravim klase u odvojenom folderu.
+Njih posle koristim svuda
+
+Servise isto pravim odvojeno pa posle pozivam njihove funkcije
+U komponenti pozivam servise i koristim klase, a kalse mogu da koristim
+i u servisima ofc
+
+funkcija izgleda:
+
+getter(): niz[]{
+  ...
+}

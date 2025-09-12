@@ -1,0 +1,16 @@
+<p>books works!</p>
+<form>
+  <input type="text" name="searchParam" [(ngModel)]="searchParam">
+  <button (click)="searchBooks()">Search</button>
+</form>
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Author</th>
+    <th>Pages</th>
+  </tr>
+  @for(b of allBooks; track b.name){
+    <app-bookdetails [book] = "b"></app-bookdetails>
+  }
+</table>

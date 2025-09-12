@@ -1,0 +1,15 @@
+Kada napravim novu komponentu i hoce da se vidi u root komponenti:
+
+u app.routes.ts menjam:
+export const routes: Routes = [
+    {path: "about", component: AboutComponent},
+    {path: "writer", component: WriterComponent}
+];
+ovako path pa koji i koji component
+
+zatim u html ih pozivam tj linkujem
+<a routerLink="/about">About</a>
+<a routerLink="/writer">Writer</a>
+<router-outlet></router-outlet> - ovo je mesto gde ce izbaciti komponentu na koju sam kliknuo
+
+i takodje moram da importujem routerLink i routerOutlet

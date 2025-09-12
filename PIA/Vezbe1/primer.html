@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css"  href="style.css">
+    <title>Document</title>
+</head>
+<body>
+    <!--Divovi su jedni ispod drugog a span je jedan pored drugog box bukv-->
+    <div>
+        <iframe src="index.html" name="fr"></iframe>
+        <a href="https://geomastr.com/street-signs/" target="fr">geomastr</a>
+
+
+
+<!--Id je jedinstven oznacava se sa #, klasa nije oznacava se sa "." 
+ako imam klasu i id na jednom h1 npr i oba imaju conflicted polje id ima prednost-->
+        <h1 id="n1">Naslov 1</h1>
+        <h1 class="n2 n3">Naslov 1.1</h1>
+        <h1 class="n2">Naslov 1.2</h1>
+        
+        
+        
+        
+        Forma
+        <form name="forma1">
+            ime: <input type="text" name="ime" id="ime1" size="10" maxlength="5" placeholder="unesiime" required>
+            lozinka: <input type="password">
+            <br/>
+            Komentar: <textarea rows="3" cols="30" placeholder="type here"></textarea>
+            <br/>
+            <input type="button" value="Obicno dugme">
+            <input type="submit" value="submit">
+            <input type="reset" value="reset">
+            Pol: <input type="radio" name="pol" value="m">m<input type="radio" name="pol" value="z" id="inputZ"><label for="inputZ">z</label>
+            <select>
+                <option>Srbija</option>
+                <option>Srbija</option>
+                <option>Srbija</option>
+            </select>
+        </form>
+    </div>
+</body>
+</html>
