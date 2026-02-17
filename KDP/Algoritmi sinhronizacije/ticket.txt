@@ -1,0 +1,37 @@
+Fer algoritam, bukv dodeljuje tikete kako ko dodje
+
+Fetch and add tj FA
+
+FA(var, incr): <int tmp = var; var = var + incr; return(tmp)>
+
+COARSE GRAIN RESENJE
+
+int number = 1;
+int next = 1
+int turn = [1:n] = 0
+process CS[i=1 to n] {
+    while(true) {
+        <turn[i] = number; number = number + 1>
+        <await(turn[i] == next);> ili while(turn[i] != next) skip;
+        KS;
+        <next = next+1;>
+        not KS;
+    }
+}
+
+FINE GRAIN RESENJE
+
+int number = 1;
+int next = 1
+int turn = [1:n] = 0
+process CS[i=1 to n] {
+    while(true) {
+        turn[i] = FA(number, 1) //entry protokol
+        while(turn[i] != next) skip;
+        KS;
+        next = next+1; //exit protokol
+        not KS;
+    }
+}
+
+

@@ -1,0 +1,50 @@
+Jedno elementni bufer tj buff promenljiva sa kojom rade i produser i konsumer
+
+
+RASPODELJENI BINARNI SEMAFORI
+
+sem empty = 1, full = 0;
+process Producer[i=1 to M] {
+    while(true){
+        wait(empty)
+        buff = data;
+        signal(full)
+    }
+}
+process Consumer[j=1 to N] {
+    while(true){
+        wait(full)
+        result = buff
+        signal(empty)
+    }
+}
+
+BOUNDED BUFFER
+
+typeT buff[n];
+int front = 0, rear = 0;
+sem empty = 1, full = 0;
+sem mutexP = 1, mutexC = 1;
+process Producer[i=1 to M] {
+    while(true){
+        wait(empty)
+        wait(mutexP) 
+        buff[rear] = data;
+        rear = (rear + 1) % n
+        signal(mutexP)
+        signal(full)
+    }
+}
+process Consumer[j=1 to N] {
+    while(true){
+        wait(full)
+        wait(mutexC)
+        result = buff[front];
+        front = (front + 1) % n
+        signal(mutexC)
+        signal(empty)
+    }
+}
+
+
+

@@ -1,0 +1,49 @@
+//Signal and wait
+
+int N = 5;
+cond can_eat[1..N];
+int state[1 ..N]; // {(thinking=0, hungry=1, eating=2) ;} 
+
+procedure Test[k]{
+    if((state[(k+4) mod 5] != 2) and (state[k] = 1) and (state[(k+1) mod 5] != 2)){
+        state[k] = 2;
+        can_eat[k].signal;
+    }
+}
+
+procedure Pickup(int id){
+    state[ID] = 1;
+    test(ID);
+    if(state[ID] != 2) can_eat[ID].wait();
+}
+
+procedure PutDown(int id){
+    state[ID] = 0;
+    test((ID+4) mod 5);
+    test((ID+1) mod 5);
+}
+
+//signal and continue
+
+int N = 5;
+cond can_eat[1..N];
+int state[1 ..N]; // {(thinking=0, hungry=1, eating=2) ;} 
+
+procedure Test[k]{
+    if((state[(k+4) mod 5] != 2) and (state[k] = 1) and (state[(k+1) mod 5] != 2)){
+        state[k] = 2;
+        can_eat[k].signal;
+    }
+}
+
+procedure Pickup(int id){
+    state[ID] = 1;
+    test(ID);
+    while(state[ID] != 2) can_eat[ID].wait();
+}
+
+procedure PutDown(int id){
+    state[ID] = 0;
+    test((ID+4) mod 5);
+    test((ID+1) mod 5);
+}

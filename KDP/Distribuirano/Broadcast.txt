@@ -1,0 +1,61 @@
+----V1 svaki zna samo o svojim susedima
+
+
+void Initiator(){
+    msg m;
+    boolean status;
+    integer s;
+    mbx_put(m, p[s]);
+}
+
+
+mbx p[N];
+
+void Node(int id){
+    boolean links[N][N];
+    msg m;
+    boolean status;
+    int edge_num = num_of_edge(links, id);
+    mbx_get(m, p[id], INF, status);
+
+    for(int i=0; i<N; i++){
+        if(links[id][i]{
+            mbx_put(m, p[i]);          
+        })
+    }    
+    for(int i=0; i< edge_num - 1; i++){
+        mbx_get(m, p[id], INF, status);
+    }
+}
+
+----V2 znamo topologiju mreze znaci ne moramo da saljemo svima
+
+void Initiator(){
+    msg m;
+    boolean status;
+    integer s;
+    boolean links[N][N];
+    links = init_topology(links);
+    m.spanningTree = links;
+    mbx_put(m, p[s]);
+}
+
+
+mbx p[N];
+
+void Node(int id){
+    msg m;
+    boolean status;
+
+    mbx_get(m, p[id], INF, status);
+
+    for(int i=0; i<N; i++){
+        if(m.spanningTree[id][i]{
+            mbx_put(m, p[i]);          
+        })
+    }    
+}
+
+
+
+

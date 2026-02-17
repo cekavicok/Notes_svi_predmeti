@@ -1,0 +1,89 @@
+ZA DVA PROCESA (coars grain resenje)
+
+bool in1 = false; 
+bool in2 = false;
+int last = 1;
+
+process CS1 {
+    while(true){
+        in1 = true; //proces 1 zeli da udje u kriticnu sekciju
+        last = 1; //proces 1 je stigao poslednji
+        <await(!in2 or last==2);> //ili je in2 false tj on je jedini koji zeli da udje a ako nije onda nije
+        //poslednji tj last == 2
+        KS;
+        in1 = false;
+        not KS;
+    }
+}
+
+process CS2 {
+    while(true){
+        in2 = true;
+        last = 2;
+        <await(!in1 or last == 1);>
+        KS;
+        in2 = false;
+        not KS;
+    }
+}
+
+
+ZA DVA PROCESA (fine grain resenje)
+
+bool in1 = false;
+bool in2 = false;
+int last = 1;
+process CS1{
+    while (true)
+    {
+        in1 = true;
+        last = 1
+        while(in2 and last == 1) skip;
+        KS;
+        in1 = false;
+        not KS;
+    }
+    
+}
+
+process CS2 {
+    while(true){
+        in2 = true;
+        last = 2;
+        while(in1 and last == 2)skip;
+        KS;
+        in2 = false;
+        not KS;
+    }
+}
+
+
+ZA N PROCESA
+
+mogu da prodjem ako sam jedini ili ako nisam prolednji
+
+in[i] - koje stanje proces CS[i] prolazi
+last[j] - koji proces je poslednji dosao u datu iteraciju
+
+int in[1:n] = ([n] 0);
+int last[1:n] = ([n] 0);
+process CS[i=1 to n] { //i je broj procesa, j je broj iteracije tj "nivo"
+    while(true){
+        for(j=1 to n){
+            in[i] = j;
+            last[j] = i;
+            for(k=1 to n; i != k) {
+                while(in[k]>=in[i] and last[j]==i) skip; 
+                //dok god je k-ti proces na >= nivou od i, i proces i je poslednji na nivou j
+            }
+        }
+        KS;
+        in[i] = 0
+        not KS;
+    }
+}
+
+Poenta algoritma, svaki proces prolazi n nivoa (j su nivoi, a i su procesi)
+k su ostali procesi, i se nece pomerati dalje dok postoji drugi proces koji je na istom 
+ili vecem nivou ili vise nije poslednji
+

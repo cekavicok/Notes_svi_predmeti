@@ -1,0 +1,25 @@
+Module Server
+    op dohvatiViljuske(idF);
+    op vratiViljuske(idF);
+Body
+Process Server{
+    const int N = 5;
+    boolean jedu[N] = false;
+    while(1){
+        in dohvatiViljuske(i) and !jedu[(i-1) mod N] and !jedu[(i+1) mod N] -> jedu[i] = true;
+        []
+        vratiViljuske(i) -> jedu[i] = false;
+        ni
+    } 
+}
+End Server;
+
+Process Filozof[i=0..4]{
+    while(1){
+        think;
+        call Server.dohvatiViljuske(i);
+        eat;
+        call Server.vratiViljuske(i);
+    }
+}
+

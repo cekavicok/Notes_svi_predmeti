@@ -1,0 +1,74 @@
+sem mutex = 1;
+sem p = 1, c[N] = {0};
+int N = ...;
+int buf[1] = {0};
+int cnt = 0;
+
+void Producer(){
+    while(true){
+        int item = produce();
+        wait(p);
+        buf[0] = item;
+        for(int i = 0; i<N; i++){
+            signal(c[i]);
+        }
+    }
+}
+
+void Consumer(int id){
+    while(true){
+        wait(c[id]);
+        int item = buf[0];
+        wait(mutex);
+        cnt++;
+        if(cnt == N){
+            cnt = 0; signal(p);
+        }
+        signal(mutex);
+        consume(item);
+    }
+}
+
+BOUNDED BUFFER verzija problema(sad buf ima vise elemenata i citaju se redom):
+
+sem mutex[B] = {1};
+sem p = B, c[N] = {0};
+int N = ...;
+int B = ...;
+int buf[B] = {0};
+int cnt[B] = 0, brp = 0;
+
+
+
+void Producer(){
+    int wi = 0; //pozicija na koju se upisuje
+    while(true){
+        int item = produce();
+        wait(p);
+        buf[wi] = item;
+        wi = (wi+1)%B;
+        for(int i = 0; i<N; i++){
+            signal(c[i]);
+        }
+    }
+}
+
+
+void Consumer(int id){
+    int ri = 0;
+    while(true){
+        wait(c[id]);
+
+        int item = buf[ri];
+
+
+        wait(mutex[ri]);
+        cnt[ri]++;
+        if(cnt[ri] == N){
+            cnt[ri] = 0; signal(p);
+        }
+        signal(mutex[ri]);
+        consume(item);
+        ri = (ri + 1) % B;
+    }
+}

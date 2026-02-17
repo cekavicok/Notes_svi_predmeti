@@ -1,0 +1,23 @@
+Module Server
+    op deposit(elem);
+    op fetch() return elem;
+Body
+Process Buffer(){
+    int N..; //velicina buffera
+    int buf[N];
+    int wi=0, ri=0, count = 0;
+    in deposit(item) and count < N -> buf[wi] = item; wi = (wi+1) mod N; count++;
+    [] fetch return item and count > 0 -> item = buf[ri]; ri = (ri+1) mod N; count--;
+    ni
+}
+end Buffer;
+
+Process Producer(int id){
+    int item = produce(...);
+    call deposit(item);
+}
+
+Process Consumer(int id){
+    int item = call fetch();
+    consume(item);
+}

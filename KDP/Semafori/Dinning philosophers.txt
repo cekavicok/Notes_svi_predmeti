@@ -1,0 +1,45 @@
+proces Philosopher(i:0..4){
+    think;
+    //uzima viljuske
+    eat;
+    //vraca viljuske
+}
+
+//najprostije resenje
+const n = 5
+sem fork[n] = 1;
+
+proces Philosopher[i:0..n-1]{
+    while(1){
+        //leva pa desna ruka
+        wait(fork[i]);
+        wait(fork[i+1]);
+        eat;
+        signal(fork[i]);
+        signal(fork[i+1]);
+        think;
+    }
+}
+
+//malo bolje resenje
+const n = 5
+sem fork[n] = 1;
+procedure Philosopher(i: 0..n-1){
+    int firstodd, secondeven;
+    if(i mod 2 = 1){ //ako je neparan filozof
+        firstodd = i;
+        secondeven = (i+1) mod n;
+    }
+    else{
+        firstodd = (i+1) mod n;
+        secondeven = i;
+    }
+    while(1){
+        think;
+        wait(fork[firstodd]);
+        wait(fork[secondeven]);
+        eat;
+        signal(fork[firstodd]);
+        signal(fork[secondeven]);   
+    }
+} 

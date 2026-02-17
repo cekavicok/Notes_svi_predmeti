@@ -1,0 +1,40 @@
+Slican kao ticket samo sto nema next 
+Nema specijalnih instrukcija
+
+COARSE GRAIN
+
+int turn[1:n] = 0;
+process CS[i=1 to n] {
+    while(true){
+        <turn[i] = max(turn[1:n]) + 1;> //entry protokol
+        for(j=1 to n; j != i){
+            <await(turn[j] == 0 or turn[i] < turn[j]);>
+        }
+        KS;
+        turn[i] = 0;
+        not KS;
+    }
+}
+
+
+FINE GRAIN RESENJE 
+
+(a,b) > (c,d) == true akko a>c ili a==c i b>d
+iz toga
+turn1 > turn2 akko (turn1,1) > (turn2,2)
+turn2 >= turn1 akko (turn2, 2) > (turn1, 1) jer je turn2 = turn1 i 2>1
+ovo daje malu prednost vecim procesima
+
+
+int turn[1:n] = 0;
+process CS[i=1 to n] {
+    while(true){
+        <turn[i] = 1; turn[i] = max(turn[1:n]) + 1;> //entry protokol
+        for(j=1 to n; j != i){
+            while(turn[j] != 0 and (turn[i],i) > (turn[j],j)) skip;
+        }
+        KS;
+        turn[i] = 0; //exit protokol
+        not KS;
+    }
+}

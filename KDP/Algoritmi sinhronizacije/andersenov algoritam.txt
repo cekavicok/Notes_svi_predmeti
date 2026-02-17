@@ -1,0 +1,24 @@
+Cilj je da smanji broj budjenja procesa tj da manje proveravaju da li je dosao njihov red za kriticnu sekciju
+
+FINE GRAIN verzija
+
+int slot = 0;
+int flag[1:n] false
+flag[1] = true
+process CS[i=1 to n]{
+    int myslot;
+    while(true) {
+        myslot = FA(slot,1) mod n+1; //entry protokol
+        while(!flag[myslot]) skip;
+        KS;
+        flag[myslot] - false //exit protokol
+        flag[(myslot mod n+1)] = true
+        not KS;
+    }
+}
+
+flag[myslot] = true => ima dozvolu za prolazak, a ako je false nema, svi dobijaju svoj slot za ulazak pomocu globalne
+promenljive slot, i ne mora da se budi svaki put nego samo za svoju promenljivu myslot 
+
+MANA: mora unapred da se zna koliko procesa ima 
+-> mod n+1 jer niz ide od 1 do n, a ne od 0 do n-1 kao normalno lol

@@ -1,0 +1,28 @@
+[(i:1..N)P(i)::produce || (j:1..M)C(j)::consume || B::coord]
+
+produce:: *[
+     int item = MAKE_ITEM;
+     B!put(item);
+]
+
+
+consume:: *[
+    int item;
+    B!get();
+    B?item;
+]
+
+coord:: 
+[
+    int buffer(0..B-1); //niz od B elemenata
+    int wi = 0, ri = 0, size = 0;
+    int item;
+    *[
+        size > 0, (j:1..M)C(j)?get() -> [ C(j)!buffer(ri); ri = (ri + 1) mod B; size = size - 1; ]
+
+        []
+
+        size < B, (i:1..N)P(i)?put(item) -> [ buffer(wi) = item; wi = (wi + 1) mod B; size = size + 1 ]
+     ]
+]
+

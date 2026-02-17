@@ -1,0 +1,127 @@
+Rolerkoster problem
+_______________________________
+
+int N = ..; //broj putnika
+int K = ..; //broj mesta na toboganu
+mbx[N] p;
+struct msg{
+    int id;
+};
+mbx rc_start, rc_end;
+
+
+void passanger(int id) {
+    msg m;
+    boolean status;
+    while(1){
+        walk();
+        //start ride
+        m.id = id
+        mbx_put(m, rc_start);
+        mbx_get(m, p[id], INF, status);
+
+        riding();
+        //end ride
+        mbx_get(m, p[id], INF, status);
+        mbx_put(m, rc_end);
+
+
+    }
+}
+
+void roller_coaster() {
+    msg m;
+    msg[K] passangers;
+    boolean status;
+
+    while(1){
+        //find pass
+        for(int i=0; i<K; i++){
+            mbx_get(m, rc_start, INF, status);
+            passangers[i] = m; //m sadrzi id ko se vozi
+        }
+        for(int i=0; i<K; i++){
+            mbx_put(passangers[i], p[passangers[i]].id);
+        }
+        //ride
+        ride();
+
+        //end ride
+        for(int i=0; i<K; i++){
+            mbx_put(passangers[i], p[passangers[i]].id);
+        }
+        for(int i=0; i<K; i++){
+            mbx_get(m, rc_end, INF, status);
+        }
+    }
+}
+
+Readers and Writers 
+________________________________________
+
+const int startRead = 0, startWrite = 1;
+mbx OpStart, opEnd;
+mbx[N] confirm;
+
+void Reader(int id){
+    msg m;
+    status boolean;
+
+    while(1){
+        m.id = id;
+        m.op = startRead;
+        mbx_put(m, OpStart);
+        mbx_get(m, confirm[i], INF, status);
+        read();
+        mbx_put(m, opEnd);
+    }
+
+}
+
+void Writer(){
+    msg m;
+    status boolean;
+
+    while(1){
+        m.id = id;
+        m.op = startWrite;
+        mbx_put(m, OpStart);
+        mbx_get(m, confirm[i], INF, status);
+        write();
+        mbx_put(m, opEnd);
+    }
+
+}
+
+void Kordinator(){
+    int numR, numW;
+    msg m, n;
+    boolean status;
+    while(1){
+        mbx_get(m, OpStart, INF, status);
+        //READ
+        if(m.operation == startRead) {
+            if(numW > 0){
+                mbx_get(n, opEnd, INF, status);
+                cntW--;
+            }
+            cntR++;
+            mbx_put(m, confirm[m.id]);
+
+        }
+        //WRITE
+        else {
+            if(numW > 0){
+                mbx_get(n, opEnd, INF, status);
+                cntW--;
+            }
+            while(numR > 0){
+                mbx_get(n, opEnd, INF, status);
+                cntR--;
+            }
+            cntW++;
+            mbx_put(m, w[m.id]);
+        }
+    }
+}
+

@@ -1,0 +1,99 @@
+Signal and wait verzija čitača i pisca
+
+
+monitor RW{
+
+    int cntR = 0;
+    int cntW = 0;
+
+    cond rq, wq;
+
+    void startRead(){
+        if(cntW > 0 || wq.queueSize() > 0){
+            rq.wait();
+        }
+        cntR++;
+    }
+
+    void endRead(){
+        cntR--;
+        if(cntR == 0 && wq.queueSize() > 0){
+            wq.signal();
+        }
+    }
+
+    viod startWrite(){
+        if(cntR > 0 || cntW > 0){
+            wq.wait();
+        }
+        cntW++;
+        if(rq.queueSize() > 0){
+            rq.signal();
+        }
+    }
+        
+
+    void endWrite(){
+        cntW--;
+        if(rq.queueSize() > 0){
+            rq.signal();
+        }
+        else if(wq.queueSize() > 0){
+            wq.signal();
+        }
+    }
+}
+
+
+
+Signal and continue verzija čitača i pisca + fifo
+
+
+
+monitor RW{
+
+    int cntR = 0;
+    int cntW = 0;
+    int ticket = 0;
+    int next = 0;
+    cond q;
+
+    void startRead(){
+        int myTicket = 2* (ticket++) + 1;
+        if (myTicket / 2 != next)
+        {
+            q.wait(myTicket);  
+        }
+        
+        cntR++;
+        next++;
+        if(q.queueSize() > 0 && q.minrank() % 2 == 0){
+            q.signal();
+        }
+    }
+
+    void endRead(){
+        cntR--;
+        if(q.queueSize() > 0 && cntR == 0){
+            q.signal();
+        }
+    }
+
+    viod startWrite(){
+        int myTicket = 2* (ticket++) + 1;
+        while(cntR > 0|| myTicket/ 2 != next){
+            q.wait(myTicket);
+        }
+
+    }
+        
+
+    void endWrite(){
+        next++;
+        if(q.queueSize() > 0){
+            q.signal();
+        }
+
+
+    }
+}

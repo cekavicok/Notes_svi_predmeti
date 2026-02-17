@@ -1,0 +1,30 @@
+Get and Set 
+
+GS(var, new){ <int tmp = var; var = new; return(tmp);> }
+koristim za prev = GS(tail, node) -> <prev = tail; tail = node;>
+
+
+Node tail = false;
+process CS[i=1 to n]{
+    while(true){
+        Node prev, node = true;
+        <prev = tail; tail = node;>
+        <await(!prev.locked);>
+        KS;
+        <node.locked = false;>
+        non KS;
+    }
+}
+
+
+Node tail = false;
+process CS[i=1 to n]{
+    while(true){
+        Node prev, node = true;
+        prev = GS(tail, node)
+        while(prev.locked) skip;
+        KS;
+        node.locked = false
+        non KS;
+    }
+}

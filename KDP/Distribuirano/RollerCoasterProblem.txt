@@ -1,0 +1,148 @@
+mbx[N] p;
+struct msg{
+    int id;
+};
+
+void passanger(int id){
+    msg m;
+    boolean status;
+    while(1){
+        walk();
+        //start ride
+        m.id = id;
+        mbx_put(m, rc_start);
+        mbx_get(m, p[id],INF, status);
+
+
+
+        riding();
+        //end ride
+        mbx_get(m, p[id], INF, status);
+        mbx_put(m, rc_end)
+        
+    }
+}
+
+mbx rc_start, rc_end;
+
+//Rolerkoster ce da bude kordinator jer je samo jedan i logicno je
+void roller_coaster(){
+    msg m;
+    msg [K] passangers;
+    boolean status;
+    
+    while(1){
+        
+        //find K passangers
+        for(int i=0; i<K; i++){
+            mbx_get(m, rc_start, INF, status);
+            passangers[i] = m;
+            
+        }
+        for(int i=0; i<K; i++){
+            mbx_put(passangers[i], p[passangers[i].id]);
+        }
+
+
+        ride();
+
+
+        //finish ride
+        for(int i=0; i<K; i++){
+            mbx_put(passangers[i], p[passangers[i].id]);
+        }    
+        for(int i=0; i<K; i++){
+            mbx_get(m, rc_end, INF, status);
+
+        }            
+        
+    }
+}
+
+
+
+----V2 Svaki proces cita poruke iz samo jednog sanduceta
+
+
+mbx[N] p;
+struct msg{
+    int id;
+    string operation;
+};
+
+void passanger(int id){
+    msg m;
+    boolean status;
+    while(1){
+        walk();
+        //start ride
+        m.id = id;
+        m.operation = "start";
+        mbx_put(m, rc);
+        mbx_get(m, p[id],INF, status);
+
+
+
+        riding();
+        //end ride
+        mbx_get(m, p[id], INF, status);
+        m.id = id;
+        m.operation = "end";
+        mbx_put(m, rc);
+        
+    }
+}
+
+mbx rc;
+
+//Rolerkoster ce da bude kordinator jer je samo jedan i logicno je
+void roller_coaster(){
+    msg m;
+    msg [K] passangers;
+    boolean status;
+    Queue<msg> buffer;
+    while(1){
+        
+        //find K passangers
+        for(int i=0; i<K; i++){
+            if(buffer.empty()){
+                mbx_get(m, rc, INF, status);
+            }
+            else{
+                m = buffer.delete();
+            }
+            passangers[i] = m;
+            
+        }
+        for(int i=0; i<K; i++){
+            mbx_put(passangers[i], p[passangers[i].id]);
+        }
+
+
+        ride();
+
+
+        //finish ride
+        for(int i=0; i<K; i++){
+            mbx_put(passangers[i], p[passangers[i].id]);
+        }    
+        for(int i=0; i<K;){
+            mbx_get(m, rc, INF, status);
+            if(m.operation == "end"){
+                //ok
+                i++;
+            }
+            else{
+                //start poruka je stigla
+                buffer.insert(m);
+            }
+        }            
+        
+    }
+}
+
+
+
+
+
+

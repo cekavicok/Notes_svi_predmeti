@@ -1,0 +1,32 @@
+prazna kosnica, N pcela, 1 medved, H meda ima u kosnici max. 
+
+
+int N = ...;
+int H = ...;
+int HoneyComb[H] = {0};
+int hcnt = 0;
+sem mutex = 1;
+sem bear = 0;
+
+void Bee(){
+    while(true){
+
+        int honey = prepare_honey();
+        wait(mutex);
+        HoneyComb[hcnt] = honey;
+        hcnt++;
+        if(hcnt == H-1){
+            signal(bear);
+        } else signal(mutex);        
+    }
+}
+
+void Bear(){
+    while(true){
+        wait(bear);
+        while(hcnt > 0){
+            eat(HoneyComb[hcnt--]); //jede kao lol
+        }
+        signal(mutex)
+    }
+}

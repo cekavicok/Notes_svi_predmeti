@@ -1,0 +1,37 @@
+Jedan kazan ima M porcija, ima N ljudozdera koji jedu, kad je kazan prazan budi se kuvar da napuni do kraja
+
+
+sem k = 0, lj = 0;
+int kazan[M] = {0};
+kcnt = 0;
+sem mutex = 1;
+
+
+void Ljudozder(int id){
+    while(true){
+        wait(mutex);
+        if(kcnt == 0){
+            signal(k);
+            signal(mutex);
+            wait(lj);
+            wait(mutex);
+        } 
+
+        kcnt--;
+        int porcije = kazan(kcnt);
+        signal(mutex);
+        eat(porcija);
+    }
+}
+
+
+void Kuvar(){
+    while(true){
+        wait(k);
+        wait(mutex);
+        punjenje_kazana(kazan); //napunilo kazan idk kako
+        kcnt = M;
+        signal(mutex);
+        signal(lj);
+    }
+}

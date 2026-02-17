@@ -1,0 +1,48 @@
+
+sem mutexm, mutexw, e, ticket, toilet
+int wcnt, mcnt;
+
+void Woman(int id){
+    while(true){
+        wait(e);
+        wait(mutexw);
+        wcnt++;
+        if(wcnt == 1 ) wait(toilet);
+        signal(mutexw);
+        signal(e);
+
+        wait(ticket);
+        use();
+        signal(ticket);
+
+        wait(mutexw);
+        wcnt--;
+        if(wcnt == 0){
+            signal(toilet);
+        }
+        signal(mutexw)
+    }
+}
+
+
+void Man(int id){
+    while(true){
+        wait(e);
+        wait(mutexm);
+        mcnt++;
+        if(mcnt == 1) wait(toilet);
+        signal(mutexm);
+        signal(e);
+
+        wait(ticket);
+        use();
+        signal(ticket);
+
+        wait(mutexm);
+        mcnt--;
+        if(mcnt == 0){
+            signal(toilet);
+        }
+        signal(mutexm)
+    }
+}

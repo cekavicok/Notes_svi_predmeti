@@ -1,0 +1,19 @@
+int n = 5;
+int viljuske[n] = 2;
+
+process Philosopher[i: 0..n-1]{
+    int levi = (i-1) mod n;
+    int desni = (i+1) mod n;
+    while(1){
+        region(viljuske){
+            await(viljuske[i] = 2);
+            viljuske[levi] = viljuske[levi] - 1;
+            viljuske[desni] = viljuske[desni] - 1;
+        }
+        eat;
+        region(viljuske){
+            viljuske[levi] = viljuske[levi] + 1;
+            viljuske[desni] = viljuske[desni] + 1;
+        }
+    }
+}

@@ -1,0 +1,24 @@
+[west::WEST || east::EAST || x::method] // pise se kao proces::metoda
+
+/*method::*[
+    c: character; //char c;
+    west?c -> east!c; 
+
+] */
+
+method:: 
+*[
+    char c;
+    west?c -> [
+        c!= '*' -> east!c;
+        []
+        c == '*' -> [
+            west?c -> [
+                c!= '*' -> [east!'*', east!c];
+                []
+                c == '*' -> east!'^';
+            ]
+        ]
+    ]
+
+]

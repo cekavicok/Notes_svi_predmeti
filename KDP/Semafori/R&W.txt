@@ -1,0 +1,89 @@
+
+int rcnt = 0;
+sem rw = 1;
+sem mutexR = 1;
+sem enter = 1;
+process Reader[i=1 to m]{
+    while(true){
+        wait(enter)
+        wait(mutexR);
+        rcnt++;
+        if(rcnt == 1) wait(rw);
+        signal(mutexR);
+        signal(enter)
+        read;
+
+        wait(mutexR);
+        rcnt--;
+        if(rcnt == 0) signal(rw)
+        signal(mutexR)
+    }
+}
+
+process Writer[j=1 to n]{
+    while(true){
+    wait(enter);
+       wait(rw);
+       signal(enter)
+       write;
+       signal(rw);
+    }
+}
+
+
+Prosledjivanje stafetne palice!!!! 
+
+int rcnt = 0;
+int wcnt = 0;
+int delay_cntr = 0, delay_cntw = 0;
+sem mutex = 1, r = 1, w = 1;
+process Reader[i=1 to m]{
+    while(true){
+        wait(mutex);
+        if(wcnt > 0){
+            delay_cntr++;
+            signal(mutex);
+            wait(r);
+        }
+        rcnt++;
+        if(delay_cntr > 0){
+            delay_cntr--;
+            signal(r);
+        } else signal(mutex);
+        read;
+        wait(mutex);
+        rcnt--;
+        if(rcnt == 0 and delay_cntw > 0){ //ako si poslednji predaj palicu da mogu pisci da pisu
+            delay_cntw--;
+            signal(w);
+        }
+        else signal(mutex);
+    }
+}
+
+process Writer[j=1 to n]{
+    while(true){
+        wait(mutex);
+        if(rcnt > 0 or wcnt > 0){
+            delay_cntw++;
+            signal(mutex);
+            wait(w);
+        }
+        wcnt++;
+        signal(mutex)
+        write;
+        
+        wait(mutex);
+        wcnt--
+        if(delay_cntr > 0){
+            delay_cntr--;
+            signal(r);
+        }
+        elseif(delay_cntw > 0){
+            delay_cntw--;
+            signal(w);
+        }
+        else signal(mutex);
+    }
+}
+

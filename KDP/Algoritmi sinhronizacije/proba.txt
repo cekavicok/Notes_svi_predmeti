@@ -1,0 +1,115 @@
+int in[1:n] = 0
+int last[1:n] = 0
+
+process CS[i=1 to n] {
+    while(true) {
+        for(g=1 to n){
+            in[i] = g;
+            last[g] = i;
+            for(p=1 to n and i!=p){
+                while(in[p] >= in[i] and last[g] == i) skip;
+            }
+        }
+        KS;
+        in[i] = 0;
+        not KS;
+    }
+}
+
+
+process CS1 {
+    while(true){
+        in1 = true
+        last = 1
+        while(in2 == true and last == 1) skip;
+        KS;
+        in1 = false;
+        not KS;
+    }
+}
+
+
+int ticket = 1; next = 1; turn[1:n] = 0
+process CS[i = 1 to n]{
+    while(true){
+        turn[i] = FA(number, 1)
+        while(turn[i] != next) skip;
+        KS;
+        next++;
+        not KS;
+    }
+}
+
+
+Node tail = false;
+process CS(i=1 to n){
+    while(true){
+        Node prev, curr = true;
+        <prev = tail; 
+    }
+}
+
+
+Reader & Writer PROBLEM - prosledjivanje stafetne palice :)
+
+int dr, dw = 0;
+sem e, r, c;
+int wcnt, rcnt;
+
+void Reader(int id){
+    while(true){
+        wait(e);
+        if(wcnt > 0){
+            dr++;
+            signal(e);
+            wait(r);
+        }
+        rcnt++;
+        if(dr > 0){
+            dr--;
+            signal(r);
+        } else signal(e);
+
+        read;
+
+        wait(e);
+        rcnt--:
+        if(rcnt == 0 and dw > 0){
+            dw--;   
+            signal(w);
+        } else signal(e);
+    }
+}
+
+void Writer(int id){
+    while(true){
+        //writer moze da pise samo ako nema drugih vrajtera i ridera
+        if(wcnt > 0 or rcnt > 0){
+            dw++;
+            signal(e);
+            wait(w);
+        }  
+        wcnt++;
+        signal(e);
+
+        write;
+        wait(e);
+        wcnt--;
+        if(dr > 0){
+            dr--;
+            signal(r);
+        }
+        elseif(dw > 0){
+            dw--;
+            signal(w);
+        }
+        else signal(e);
+
+    }
+
+}
+
+
+
+
+

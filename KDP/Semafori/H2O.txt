@@ -1,0 +1,88 @@
+
+sem oq = 0, hq = 0;
+sem mutex = 1;
+int ocnt = 0;
+int hcnt = 0;
+void Oxy(){
+    wait(mutex);
+    ocnt++;
+    if(hcnt >= 2){
+        signal(hq);
+        signal(hq);
+        signal(oq);        
+        ocnt -= 1;
+        hcnt -= 2;
+        signal(mutex);
+    }
+    else{
+        signal(mutex);
+    }
+    wait(oq);
+}
+
+void Hydrogen(){
+    wait(mutex);
+    hcnt++;
+    if(ocnt >= 1 and hcnt >= 1){
+        signal(oq);
+        signal(hq);
+        signal(hq);
+        ocnt -= 1;
+        hcnt -= 2;
+        signal(mutex);
+    } else {
+        signal(mutex);
+
+    }
+    wait(hq);
+}
+
+
+sanja verzija 
+
+
+sem oq = 0, hq = 0, hok = 0, ook = 0;
+sem mutex = 1;
+int ocnt = 0;
+int hcnt = 0;
+void Oxy(){
+    wait(mutex);
+    ocnt++;
+    if(hcnt >= 2){
+        ocnt -= 1;
+        hcnt -= 2;
+        signal(hq);
+        wait(hok);
+        signal(hq);
+        wait(hok);
+        signal(mutex);
+    }
+    else{
+        signal(mutex);
+        wait(oq);
+        signal(ook);
+    }
+}
+
+void Hydrogen(){
+    wait(mutex);
+    hcnt++;
+    if(ocnt >= 1 and hcnt >= 2){
+        ocnt -= 1;
+        hcnt -= 2;        
+        signal(oq);
+        wait(ook);
+        signal(hq);
+        wait(hok);
+
+        signal(mutex);
+    } else {
+        signal(mutex);
+
+        wait(hq);
+        signal(hok);
+    }
+
+}
+
+idk about this :(

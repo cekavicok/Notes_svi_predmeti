@@ -1,0 +1,66 @@
+Аутомобили који долазе са севера и југа морају да пређу реку преко моста 
+(One lane bridge problem). На мосту, на жалост, постоји само једна возна трака. 
+Значи, у било ком тренутку мостом може да прође један или више аутомобила који
+ долазе из истог смера (али не и из супротног смера). Користећи CSP написати 
+ програм који решава дати проблем. Спречити изгладњивање.
+
+
+[ime mbx::ime procesa]
+[Bridge::BRIDGE || Car(0..N)::CAR]
+
+
+BRIDGE::[
+    //proveri stranu
+    //ako na strani ima vozila, sacekaj,
+    //ako nema prodji
+    int waiting(0..2, 0..N);
+    int waitingNum(0..2) = 0;
+    int priority = 0; // 1-leva strana, 2 desna strana, 0 niko
+    int currCrossing = 0; //1 leva, 2 desna
+    int curr = 0;
+
+    *[
+        (0..N)Car(i)?request(side) -> [
+            currCrossing = side and priority = side -> [
+                curr := curr + 1;
+                Car(i)!pass;
+            ]
+            []
+            currCrossing = side and priority != side -> {
+                waiting(side-1, waitingNum(side-1)) = i;
+                waitingNum(side-1) := waitingNum(side-1) + 1;
+            }
+            []
+            currentCrossing != side ->[
+            priority = side;
+            waiting(side-1, waitingNum(side-1)) = i;
+            waitingNum(side-1) := waitingNum(side-1) + 1;
+        ] 
+        []
+        (i: 0..N)Car(i)?passed -> [
+            curr := curr - 1;
+            [
+                curr = 0 and priority != currCrossing -> [
+                    waitingNum(currCrossing-1) == 0 ->[
+                        priority = (3-priority);
+                    ]
+                    currCrossing := (3 - currCrossing);
+                    (j: 0..waitingNum)
+                    Car(waiting(j, currentCrossing-1))!pass;
+                    waitingNum := 0; 
+                ]
+                
+            ]
+        ]
+    ]
+   
+
+
+]
+
+
+CAR(int id)::[
+    Bridge!request(side);
+    Bridge?pass;
+    Bridge!passed;
+]

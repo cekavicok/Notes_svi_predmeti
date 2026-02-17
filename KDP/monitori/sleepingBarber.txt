@@ -1,0 +1,31 @@
+int barber = 0, chair = 0, open = 0;
+
+cond barber_available; // signal kada barber > 0
+cond chair_occupied; // signal kada chair > 0
+cond door_open; // kada open > 0
+cond customer_left; // open == 0;
+
+procedure get_haircut() {
+    while(barber == 0) wait(barber_available);
+    barber--; //stigao na red za sisanje
+    chair++;
+    signal(chair_occupied); //javio berberinu da sam tu na stolici za sisanje
+    while(open == 0) wait(door_open); //cekam da me berberin pusti da idem
+    open--;
+    signal(customer_left); //javio da sam otisao sledecem za sisanje
+}
+
+procedure get_next_customer(){
+    barber++;
+    signal(barber_available);
+    while(chair == 0) wait(chair_occupied);
+    chair--;
+}
+
+procedure finished_cut(){
+    open++;
+    signal(door_open);
+    while(open>0) wait(customer_left);
+}
+
+
