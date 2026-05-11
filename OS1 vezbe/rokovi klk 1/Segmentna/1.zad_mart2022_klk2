@@ -1,0 +1,39 @@
+struct RegionDesc {
+    byte* addr;
+    size_t size;
+    RegionDesc* next;
+};
+
+
+int createRegion(RegionDesc** phead, byte* addr, size_t sz){
+    if(!phead || sz == 0 || addr+sz-1 > MAX_VADDR) return -1;
+
+    RegionDesc *prev = nullptr, *curr = *phead;
+    while(curr && addr >= curr->addr){
+        prev = curr;
+        curr = curr->next; //ili curr = prev->next :)
+    }
+    //provere sam zaboravio!!! kao i uvek :(
+    if(prev && prev->addr + prev->size > addr){
+        return -1;
+    }
+    if(curr && addr+sz-1 > curr->addr){
+        return -1;
+    }
+    RegionDesc *dsc = (RegionDesc*)kmalloc(sizeof(RegionDesc));
+    if(!dsc){
+        return -2;
+    }
+
+    dsc->addr = addr;
+    dsc->size = sz;
+    dsc->next = curr;
+    if(prev){
+        prev->next = dsc;
+    }
+    else {
+        *phead = dsc;
+    }
+    return 0;
+
+}

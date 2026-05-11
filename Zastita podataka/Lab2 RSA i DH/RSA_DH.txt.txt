@@ -1,0 +1,47 @@
+from math import sqrt
+
+n = 64507
+e = 509
+p = None
+q = None
+for i in range(2, int(sqrt(n))+1):
+    if n % i == 0:
+        p = i
+        q = n//i
+        break
+print(p)
+print(q)
+phi_n = (p-1)*(q-1)
+d = pow(e, -1, phi_n)
+print("komponenta d privatnog kljuca je: " + str(d))
+
+key = "NEKI KLJUC ZA DESIFROVANJE KOJI JE VEC DOSAO"
+dec_key = pow(key, d, n)
+
+#Drugi zadatak je bio DH. Iz prvog se dobije modul koji importujes (.pyc fajl) i pravis se da je to server
+#na njemu su funkcije neke koje se bukvalno kopiraju pa se i pravis se da radis Man in the middle napad koji je
+#na slajdovima
+
+q = 200003
+alfa = 19
+xm = 103
+xn = 148134
+
+ym = pow(alfa, xm, q)
+key = pow(ym, xn, q)
+print(key)
+
+keydigits = []
+while key != 0:
+    keydigits.append(key % 10)
+    key = key // 10
+keydigits.reverse()
+
+def decrypt(c, k):
+    return chr((ord(c) - ord("A") - k) % 26 + ord("A"))
+
+ciphertext = "UQFCECBWDGELOLSAQAJXOUUHOMBTEHFBXCTKFEFNPWFMUQSLQUBEFKFB"
+plaintext = ""
+for i in range(len(ciphertext)):
+   plaintext += decrypt(ciphertext[i], keydigits[i % len(keydigits)])
+print(plaintext)

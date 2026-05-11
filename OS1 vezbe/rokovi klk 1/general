@@ -1,0 +1,24 @@
+
+->ulong binaryStartOffs = *(ulong*)(inputObj + OffsBinaryStartOffset);
+Kad dereferenciram gledam vrednost koja se nalazi na adresi :)
+
+Organizacije memorije
+->Particisionisanje
+    Memorija se podeli na N particija i svaka od tih N particija je pocetak virtuelnog adresnog prostora sada. 
+    Svaki virtuelni adresni prostor pocinje od 0 i Fizicka adresa se onda dobija sabiranje Virtuelne adrese sa
+    baznim registrom (Bazni registar se cuva u nekom registru procesora i predstavlja gde fizicki pocinje Virt adr prostor)
+-> Kontinualna
+
+->Segmentna
+    ->Memorija se podeli na n segmenata iste velicine koji su u virtuelnom adresnom prostoru jedni pored drugog, a u 
+    operativnoj memoriji mogu biti bilo gde razbacani. 
+    ->Racunanje adrese:
+    VA - Segment|Offset
+    Segment sluzi da pokaze rd broj segmenta na koji gledam u SMT, kao descr_addr = SMTP + Segment*descr_size
+    (descr size je uvek velicina dvojke da bi se radio sift ulevo za tu velicinu samo optimizacija maxovanje)
+    Offset + base address tako dobijam fizicku adresu
+    ->U smt se nalazi Base Address(u fizickoj memoriji) i Limit (offset <= limit ofc)
+    ->Broj segmenata:  Maksimalna veličina segmenta je 8 KB = 2^13 B, a VA je velicina 16B. Zbog toga
+    virtuelni adresni prostor ima 2^(16[VA]-13[Max seg size]) = 2^3 = 8 segmenata
+->Segmentno-Stranicna 
+    

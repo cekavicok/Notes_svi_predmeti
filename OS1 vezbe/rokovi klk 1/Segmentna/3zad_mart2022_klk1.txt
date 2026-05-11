@@ -1,0 +1,10 @@
+#define SMT_SIZE 16
+typedef unsigned long SMT[SMT_SIZE];
+
+int shareSeg(SMT smt1, unsigned seg1, SMT smt2, unsigned seg2){
+    if(smt1[seg1] || !smt2[seg2]){
+        return -1;
+    }
+    smt1[seg1] = smt2[seg2];
+    return 0;
+}

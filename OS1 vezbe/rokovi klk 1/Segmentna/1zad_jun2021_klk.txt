@@ -1,0 +1,29 @@
+struct SegDesc {
+    unsigned* startAddr;
+    unsigned size;
+    unsigned short rwx;
+};
+
+const unsigned SEG_WIDTH = 12, OFFS_WIDTH = 20
+const unsigned MAX_SEG_SIZE = 1U << OFFS_WIDTH
+//tj to je 2^20 velicina jednog segmenta
+
+inline void setSMTEntry(
+    unsigned long* smt,
+    unsigned seg,
+    unsigned limit, unsigned paddr, unsigned rwx
+) {
+    smt[seg] = (paddr<<(OFFS_WIDTH+3)) | (limit<<3) | rwx;
+}
+
+void initSegment(SegDesc*sd, unsigned long* smt){
+    unsigned size = sd->size;
+    unsigned saddr = sd->startAddr;
+    while(size > 0){
+        setSMTEntry(smt, saddr>>OFFS_WIDTH, 
+        size>MAX_SEG_SIZE:MAX_SEG_SIZE-1?size-1, 0, sd->rwx);
+        if(size< MAX_SEG_SIZE) break;
+        size -= MAX_SEG_SIZE;
+        saddr += MAX_SEG_SIZE;
+    }
+}
