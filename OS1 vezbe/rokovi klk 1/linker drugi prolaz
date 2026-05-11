@@ -1,0 +1,31 @@
+
+typedef unsigned long ulong;
+ulong OffsBinaryStartOffset = 0;
+#define OffsNumOfImportedSymbols (OffsBinaryStartOffset + sizeof(ulong))
+#define OffsImportedSymnols (OffsNumOfImportedSymbols + sizeof(ulong))
+
+int resolveSymbols (char* inputObj, char* output){
+    ulong BinaryStartOffset = *(ulong*)(inputObj + OffsBinaryStartOffset);
+    //(ulong*)(inputObj + OffsBinaryStartOffset); bilo je char* sad je ulong*
+    // *(ulong*)(inputObj + OffsBinaryStartOffset) je dereferenciranje pointera tj uzimam vrednost na koju pokazuje
+    //inputObj + 0 tj OffsBinaryStartOffset, a ta vrednost je pomeraj od pocetka fajla do pocetka binarnog dela
+    char* BinaryStart = inputObj + BinaryStartOffset; 
+    ulong numOfSymbols = *(ulong*)(inputObj + OffsNumOfImportedSymbols);
+    char* listaOfSymbols = inputObj + OffsImportedSymnols;
+    for(ulong i = 0; i < numOfSymbols; i++){
+        ulong addr = SymbolTable::resolveSymbol(listaOfSymbols);
+        if(addr == 0){
+            return errorSymbolUndefined(listaOfSymbols);
+        }
+        ulong symbollen = strlen(listaOfSymbols) + 1;//duzina imena simbola + 1 za null terminator tj \0
+        ulong fieldOffs = *(ulong*)(listaOfSymbols + symbollen);
+        for(; fieldOffs > 0; fieldOffs = *(ulong*)(BinaryStart + fieldOffs)){
+            *(ulong*)(output + fieldOffs) = addr;
+        }
+        listaOfSymbols += symbollen + sizeof(fieldOffs);
+    }
+    return 0;
+}
+
+
+

@@ -1,0 +1,109 @@
+*Cezarov algoritam - svako slovo se menjam slovom za 3 mesta ispred
+
+*Monoalfabetski - isto kao cezarov samo sto je mesanje slova random,
+problem je sto je ucestanost nekih slova i ucestanost kombinacije nekih
+slova veca od drugih pa je lako provaliti sta je sta
+
+*Gausova metoda - slova koja su cesca kodujemo kao vise razlicitih slova
+npr slovo E kodujemo sa A, ?, &. Time bi trebalo da se izjednaci
+ucestanost pojavljivanja svih slova. Problem je prevelika razlika
+izmedju najcesce i najmanje koriscenog slova.
+
+*Playfair algoritam - izaberem kljucnu rec, zatim pisem 5x5 matricu,
+u nju prvo upisem kljucnu rec, i zatim pisem ceo alfabet pri cemu
+izbacujem sva slova koja su se pojavila u kljucu.
+Zatim pratim sledeca pravila:
+1) izmedju svaka dva ista slova koja su ista ubacujem neko slovo da
+popunim. NPR: balloon -> x -> ba lx lo on
+2)Ako su oba slova u istom redu, zamenim sa slovima desno od njih 
+(bukvalno svako slovo sa njegovim prvim desno)
+3)Ako su dva slova u istoj koloni, onda menjam sa slovom ispod
+(opet bukvalno slovo ispod onog koje menjam u istom redu)
+4)u opstem slucaju imam dva slova i napravim pravougaonik u matrici, 
+pa menjam svako slovo, slovom koje je u drugom temenu istog reda 
+(drugom temenu tog kao pravougaonika xD )
+
+*Polialfabetski algoritmi
+Vigenere algoritam - napravi se kljuc i svako slovo se rotira za broj
+slova u kljucu u abecedi. BITNO krece od 0 tipa slovo A je pomeraj od 0
+primer
+deceptivedeceptivedeceptive
+wearediscoveredsaveyourself
+ZICVTWQNGRZGVTWAVZHCQYGLMGJ
+
+FORMULA:
+Ci = (Mi+Ki) mod 26, Mi = (Ci - Ki) mod 26 
+
+*Autokey algoritam - mala promena u odnosu na vigenere algoritam
+sada se umesto ponavljanja kljuca do duzine poruke, stavi pocetak poruke
+do duzine poruke i tako sifruje, sto resava problem da ce na svakih
+9 karaktera biti sifrovano istim pomerajem, ali idalje nije dovoljno
+dobro resenje
+primer
+deceptive|wearediscoveredsav
+wearedisc|overedsaveyourself
+ZICVTWQNGRZGVTWAVZHCQYGLMGJ
+
+*Hilova sifra - matricno mnozenje mgrama npr trigrama
+npr rec YOU(24|14|20)
+i matrica 
+3 25 4
+23 6 15
+13 17 21
+
+i sad dobijam -> c1 = (3*24+23*14+13*20) mod 26 = 654 mod 26 = 4 (E)
+                c2 = (25*24 + 6*14 + 17*20 ) mod 26 = 1024 mod 26 = 10(K) 
+                c3 = (4*24 + 15*14 + 21*20 ) mod 26 = 726 mod 26 = 24(Y)
+dobija se C = EKY(4|10|24)
+
+dekriptovanje - K^-1
+det(K) mod 26 = -6335 mod 26 = 9 mod 26
+det(K)^-1 = 9^-1 mod 26 = 3
+(posto je 9*3 = 27, a 27 mod 26 = 1, tj. stalno trazim broj tako da 
+pomnozim taj ^-1 broj i da po modulu npr 26 dobijem jedan. Modul moze
+biti i nes drugo isti je princip skroz lol)
+K^-1 = det(K)^-1 * adj(K) mod 26 = 3 adj(K) mod 26
+
+kad odredim inverznu onda po istom principu dobijam originalni tekst
+
+*Vernamov algoritam - prvi binarni algoritam
+Ci -> i-ti kriptovanog teksta, Pi -> i-ti plain teksta
+Ci = Pi XOR Ki
+invernzna operacija:
+Pi = Ci XOR Ki
+
+*Transpozicioni algoritmi - vrsi se promena redosleda slova tj 
+karaktera
+
+*Rail fence algoritam - 
+poruka se pise dijagonalno u nekoliko redova
+i krajnja poruka se pise po redu samo npr
+Voz ide po pruzi
+v...d...p...i
+.o.i.e.o.r.z.
+..z...p...u..
+konacno : vdpioieorzzpu
+
+jako lako za razbijanje
+
+*Raw transposition algoritam - 
+plain text se ispisuje po redovima koji su duzine kljuca
+
+npr: planin text: Zanimljiva informacija
+
+key: 4312567
+     zanimlj
+     ivainfo
+     rmacija
+
+konacno: naaiicavmzirmnilfjjoa
+ovaj algoritam mogu da primenim vise puta sa istim kljucem i onda
+je kao jaci jer je patern onda manje uocljiv
+
+
+*Produkcioni algoritmi
+
+
+
+
+

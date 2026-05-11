@@ -38,3 +38,18 @@ process CS[i=1 to n] {
         not KS;
     }
 }
+
+
+int turn[1:n] = 0;
+process CS[i=1  to n]{
+    while(true){
+        turn[i] = 1;
+        turn[i] = max(turn[1:n]) + 1;
+        for(j=1 to n and j != i){
+            while(turn[j] !=0 and (turn[i], i) > (turn[j], l)) skip;
+        }
+        ks;
+        turn[i] = 0;
+        not ks;
+    }
+}

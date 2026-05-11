@@ -11,8 +11,8 @@ process CS[i=1 to n]{
         myslot = FA(slot,1) mod n+1; //entry protokol
         while(!flag[myslot]) skip;
         KS;
-        flag[myslot] - false //exit protokol
-        flag[(myslot mod n+1)] = true
+        flag[myslot] = false //exit protokol
+        flag[(myslot mod n + 1)] = true
         not KS;
     }
 }
