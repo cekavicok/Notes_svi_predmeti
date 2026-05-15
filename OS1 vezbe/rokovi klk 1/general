@@ -1,6 +1,13 @@
-
+General things
 ->ulong binaryStartOffs = *(ulong*)(inputObj + OffsBinaryStartOffset);
 Kad dereferenciram gledam vrednost koja se nalazi na adresi :)
+-> kad hocu da vracena vrednost bude pokazivac moram da vratim referencu tj.
+    PageDesc* fukncija(...){
+        ...
+        return &nesto
+    }
+
+
 
 Organizacije memorije
 ->Particisionisanje
@@ -21,4 +28,14 @@ Organizacije memorije
     ->Broj segmenata:  Maksimalna veličina segmenta je 8 KB = 2^13 B, a VA je velicina 16B. Zbog toga
     virtuelni adresni prostor ima 2^(16[VA]-13[Max seg size]) = 2^3 = 8 segmenata
 ->Segmentno-Stranicna 
+    offset - velicina stranice
+    page - broj stranica u segmentu znaci delim seg_size / page_size
+    segment - ostatak od sve toga
+    VA - segment | page | offset
+    ->Komplikovan hardver i sporo je preslikavanje
+->Stranicna
+    Postoje samo stranice iste i u PA i u VA 
+    VA - page | offset
+    PA - frame = frame_iz_PMT + offset
+    Mnogo brze resenje hardversko a sve iste dobre osobine segmentno stranicnog
     

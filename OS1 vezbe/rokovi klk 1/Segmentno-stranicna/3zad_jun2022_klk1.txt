@@ -1,0 +1,32 @@
+cosnt unsigned segw = 8, pagew = 8, offsw = 16;
+const unsigned maxsegsize = 1U << pagew << offsw;
+const unsigned pagesize = 1U << offsw;
+const unsigned
+
+inline void setSMTEntry(unsigned smt[][2], unsigned seg,
+    unsigned limit, unsigned short* pmt, unsigned short rwx
+){
+    smt[seg][0] = ((unsigned)rwx<<29) | limit;
+    smt[seg][1] = (unsigned)pmt;
+}
+
+int initSegment(SegDesc* sd, unsigned smt[][2]){
+    unsigned size = sd->size;
+    unsigned saddr = sd->startAddr;
+    unsigned segs = (size+maxsegsize-1)/maxsegsize;
+    if(PMT:reserve(segs) < 0){
+        return -1;
+    }
+    while (size > 0){
+        unsigned short* pmt = PMT::alloc();
+        unsigned limit = size > maxsegsize ? maxsegsize-1 : size-1;
+        limit >>= offsw;
+        unsigned seg = saddr >> (pagew + offsw);
+        setSMTEntry(smt, seg, limit, pmt, sd->rwx);
+        if(size < maxsegsize){
+            break;
+        }
+        size -= maxsegsize;
+        saddr += maxsegsize;
+    }
+}

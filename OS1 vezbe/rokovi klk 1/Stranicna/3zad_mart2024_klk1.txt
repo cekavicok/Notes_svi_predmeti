@@ -1,0 +1,42 @@
+typedef Frame uint16;
+typedef Page uint32;
+Frame getFreeFrame();
+
+class SegDesc {
+public:
+    int allocPage(Page page);
+    ...
+protected:
+    virtual int initPage(Page, Frame);
+    ...
+private:
+    Page startPage;
+    PMT* pmt;
+    SegDesc* sharedSeg = nullptr;
+    ...
+};
+class PMT {
+public:
+    Frame getFrame(Page) const;
+    void setFrame(Page, Frame);
+...
+};
+
+int SegDesc::allocPage(Page page){
+    Frame frame = 0;
+    int status = 0;
+    if(sharedSeg){
+        Page otherPage = page - this->startPage + this->sharedSeg->startPage
+        frame = this->sharedSeg->pmt->getFrame(otherPage);
+
+    }
+    if(!frame){
+        frame = getFreeFrame();
+        status = this->initPage(page, frame);
+        if(status != 0){
+            return status;
+    }
+    this->pmt->setFrame(page, frame);
+    return status;
+}
+

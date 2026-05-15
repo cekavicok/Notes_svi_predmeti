@@ -1,0 +1,30 @@
+struct SegDesc {
+SegDesc *left, *right;
+size_t pg, sz;
+...
+};
+
+//1)
+SegDesc* findSegDesc (SegDesc* root, size_t page){
+    SegDesc* sd = root;
+    while(sd){
+        // segment zauzima stranice [pg, pg+sz-1]; proveri da li page pada u taj opseg
+        if(sd->pg <= page && sd->pg + sd->sz > page) return sd;
+        else if(sd->pg > page) sd = sd->left;
+        else sd = sd ->right;
+    }
+    return nullptr;
+}
+
+//2)
+
+int handlePageFault (PCB* pcb, size_t page){
+    SegDesc* sd = findSegDesc(pcb->segdesc, page);
+    if(!sd) return -1;
+    size_t frame = allocateFrame();
+    if(!frame) return -2;
+    int s = sd->vtp->loadPage(page,frame);
+    if(s<0) return s;
+    setPMTEntry(pcb, page, frame, sd);
+    return 0;
+}

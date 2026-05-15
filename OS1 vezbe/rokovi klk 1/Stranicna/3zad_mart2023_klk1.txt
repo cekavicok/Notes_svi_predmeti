@@ -1,0 +1,21 @@
+typedef PgDsc uint32;
+typedef Frame uint16;
+inline void setPgRw(PgDsc* pd){
+    // (PgDsc)3 = 0b11; <<30 pomera na bit31(R) i bit30(W); 
+    //|= ne dira ostale bite (X, broj okvira)
+    *pd |= ((PgDsc)3) << 30;
+}
+
+int copyOnWrite(uint32* pd){
+    Frame oldFrame = (Frame)(*pd);
+    if(frames[oldFrame] > 1){
+        Frame newFrame = getFreeFrame();
+        if(newFrame == 0) return -1;
+        frames[newFrame] = 1;
+        frames[oldFrame]--;
+        *pd = newFrame;
+        copyFrame(oldFrame, newFrame);
+    }
+    setPgRw(pd);
+    return 0;
+}

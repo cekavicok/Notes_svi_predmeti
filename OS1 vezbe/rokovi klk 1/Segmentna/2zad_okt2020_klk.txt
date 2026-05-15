@@ -1,0 +1,39 @@
+
+
+BestFit varijanta
+struct FreeSegDesc {
+    FreeSegDesc *left, *right;
+    size_t sz;
+    void* addr;
+}
+
+SegDesc* findSegDesc (SegDesc* root, size_t size){
+    SegDesc *sd = root; *bestFit = nullptr;
+    while(sd){
+        if(sd->sz == size) return sd;
+        else if(sd->sz < size) sd = sd->right;
+        else{
+            bestFit = sd;
+            sd = sd->left;
+        }
+    }
+    return bestFit;
+}
+
+firstFit varijanta
+
+
+struct FreeSegDesc {
+    FreeSegDesc *left, *right;
+    size_t sz;
+    ...
+}
+
+SegDesc* findSegDesc (SegDesc* root, size_t size){
+    SegDesc *sd = root;
+    while(sd){
+        if(sd->sz >= size) return sd;
+        else sd = sd->right;
+    }
+    return nullptr;
+}
