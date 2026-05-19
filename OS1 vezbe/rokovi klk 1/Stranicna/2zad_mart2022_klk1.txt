@@ -1,0 +1,18 @@
+const uint32 PMT0_size = 1024;
+const uint32 PMT1_size = 1024;
+
+typedef uint32 PMT1[PMT1_size];
+typedef uint32 PMT0[PMT0_size];
+
+void* v2pAddr(PMT0 pmt, void* vaddr){
+    uint32 p0 = (uint32)vaddr >> 22;
+    uint32 p1 = ((uint32)vaddr << 10) >> 22;
+    uint32 offset = ((uint32)vaddr << 20) >> 20;
+
+    uint32* pmt1 = (uint32*)pmt[p0];
+    if(!pmt1) return nullptr;
+    uint32 frame = pmt1[p1] >> 3;
+    if(!frame) return nullptr;
+    uint32 paddr = (frame << offset) + offset;
+    return (void*)paddr;
+}

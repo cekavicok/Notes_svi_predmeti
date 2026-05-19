@@ -1,0 +1,51 @@
+const size_t BIOS_PADDR = 0x0;
+const size_t BIOS_SIZE = 0x2000;
+const size_t BIOS_VADDR = 0xFFE000;
+const size_t MMIO_PADDR = 0x2000;
+const size_t MMIO_SIZE = 0x80000;
+const size_t MMIO_VADDR = 0xF7E000;
+const size_t SRAM_PADDR = 0x82000;
+const size_t SRAM_SIZE = 0x1000;
+const size_t SRAM_VADDR = 0xF7D000;
+const size_t KTXT_PADDR = 0x83000;
+const size_t KTXT_SIZE = 0x10000;
+const size_t KTXT_VADDR = 0xF6D000;
+const size_t KDATA_PADDR = 0x93000;
+const size_t KDATA_SIZE = 0x6D000;
+const size_t KDATA_VADDR = 0xF00000;
+initPMTEntry(PMT*, size_t page, size_t frame, int prot);
+static const size_t page_size = 0x1000;
+static const size_t bios_page_size = BIOS_SIZE/page_size+(BIOS_SIZE%page_size!=0);\
+//bios_page_size je zapravo broj stranice tj vise smisal ima da pise
+//bios_page_cnt;
+static const size_t bios_page = BIOS_VADDR/page_size;
+static const size_t bios_frame = BIOS_PADDR/page_size;
+
+static const size_t mmio_page_size = MMIO_SIZE/page_size+(MMIO_SIZE%page_size!=0);
+static const size_t mmio_page = MMIO_VADDR/page_size;
+static const size_t mmio_frame = MMIO_PADDR/page_size;
+
+static const size_t sram_page_size = SRAM_SIZE/page_size+(SRAM_SIZE%page_size!=0);
+static const size_t sram_page = SRAM_VADDR/page_size;
+static const size_t sram_frame = SRAM_PADDR/page_size;
+
+static const size_t ktxt_page_size = KTXT_SIZE/page_size+(KTXT_SIZE%page_size!=0);
+static const size_t ktxt_page = KTXT_VADDR/page_size;
+static const size_t ktxt_frame = KTXT_PADDR/page_size;
+
+static const size_t kdata_page_size = KDATA_SIZE/page_size+(KDATA_SIZE%page_size!=0);
+static const size_t kdata_page = KDATA_VADDR/page_size;
+static const size_t kdata_frame = KDATA_PADDR/page_size;
+
+void mapKernelVMem (PMT* pmt){
+    for(size_t i=0; i < bios_page_size; i++)
+        initPMTEntry(pmt, bios_page+i, bios_frame+i, PROT_EXEC|PROT_READ);
+    for (size_t i=0; i<mmio_page_size; i++)
+        initPMTEntry(pmt,mmio_page+i,mmio_frame+i,PROT_READ|PROT_WRITE);
+    for (size_t i=0; i<sram_page_size; i++)
+        initPMTEntry(pmt, sram_page+i, sram_frame+i, PROT_READ|PROT_WRITE);
+    for (size_t i=0; i<ktxt_page_size; i++)
+        initPMTEntry(pmt, ktxt_page+i, ktxt_frame+i, PROT_EXEC);
+    for (size_t i=0; i<kdata_page_size; i++)
+        initPMTEntry(pmt, kdata_page+i, kdata_frame+i, PROT_READ|PROT_WRITE);
+}

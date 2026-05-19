@@ -6,6 +6,18 @@ Kad dereferenciram gledam vrednost koja se nalazi na adresi :)
         ...
         return &nesto
     }
+->ako stavim static u scope celog fajla -> ne exportuje se
+->Zaokruzivanje na gore 
+    a = b/c+(b%c!=0);
+    a = (b + c - 1) / c;
+    zaokruzejem na gore u slucaju npr: 
+    Ako oblast zauzima npr. 5 KB a stranica je 4 KB:
+    |  stranica 0 (4KB)  |  stranica 1 (4KB)  |
+    |== oblast (5KB) ====|= 1KB =|             |
+    Trebaju ti 2 stranice da pokrijes tu oblast, iako drugu ne koristis celu.
+    Ako zaokružis nadole → 5/4 = 1 stranica → nedostajes 1KB oblasti, greska
+    Ako zaokružis nagore → 5/4 = 2 stranice → oblast je cela pokrivena 
+
 
 
 

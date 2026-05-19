@@ -1,0 +1,20 @@
+//ERR_ILLEGAL_ADDRESS - ako getSegDesc vrati null
+//ERR_ILLEGAL_OP - getPageProt i getSegProt oba proverim,
+//ali page prot samo za write
+//ERR_ILLEGAL_USR_OP specificno za PROT_USR
+//
+
+int handleProtectionFault(Process* proc, size_t page, int op){
+    SegDsc* sd = getSegDesc(proc, page);
+    if(!sd) return ERR_ILLEGAL_ADDRESS;
+
+    int lprot = getSegProt(sd);
+    if((lprot & op) == 0) return ERR_ILLEGAL_OP;
+    if((lprot & PROT_USR) == 0) return ERR_ILLEGAL_USR_OP;
+
+    PMT* pmt = getPMT(proc);
+    PageDsc* pd = getPageDesc(pmt, page);
+    int page_prot = getPageProt(pd);
+    if ((lprot & PROT_WRITE) && !(page_prot & PROT_WRITE)) return copyOnWrite(pd);
+    return ERR_UNKNOWN;
+}

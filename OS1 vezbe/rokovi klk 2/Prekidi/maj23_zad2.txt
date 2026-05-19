@@ -1,0 +1,29 @@
+void yield () {
+    asm {
+        ; Save the current context
+        push spc ; save regs on the process stack
+        push ssp
+        push r0
+        push r1
+        ...
+        push r31
+        load r0, oldRunning ; r0 now points to the running PCB
+        store sp, [r0+PCB::sp] ; save SP
+        ; Restore the new context
+        load r0, newRunning
+        load sp, [r0+PCB::sp] ; restore SP
+        pop r31 ; restore regs
+        ...
+        pop r0
+        pop ssp
+        pop spc
+    }
+}
+
+
+void initContext (PCB* pcb, void* usrStk, void* krnlStk, void* startAddr){
+    uint32* kernel_stack = (uint32*)krnlStk;
+    *kernel_stack = (uint32)startAddr;
+    *(kernel_stack-1) = (uint32)usrStk;
+    pcb->sp = kernel_stack-34;
+}

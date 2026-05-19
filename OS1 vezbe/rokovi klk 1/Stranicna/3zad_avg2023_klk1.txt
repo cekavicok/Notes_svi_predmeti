@@ -1,0 +1,18 @@
+// u PCB (*)(PCB* pcb, uint32 page)
+
+void handlePageFault(PCB* pcb, uint32 page){
+    SegDsc* sd = getSegDesc(pcb, page);
+    
+    if(!sd)
+    {   
+        pcb->handleMemSegFault(pcb, page);
+        return;  
+    }
+    void* frame = allocFrame();
+    PageDsc* pd = getPageDesc(pcb, page);
+    if(isFirstAccess(pd)){
+        setAccessed(pd);
+        sd->coldLoad(sd, pcb, pd, page, frame);
+    } else
+        sd->hotLoad(sd, pcb, pd, page, frame);
+}
