@@ -1,0 +1,48 @@
+#define handle_error(msg) do { \
+    printf(msg); \
+    exit(-1); \ } while(0)
+
+const int M = ... , N = ...;
+extern double mat[M][N];
+pid_t pids[M];
+
+int max(int i){
+    double m = mat[i][0];
+    int mj = 0;
+    for(int j = 1; j<N; j++){
+        if(mat[i][j] > m){
+            m = mat[i][j];
+            mj = j;
+        }
+    }
+    return mj;
+}  
+
+void main(){
+    for(int i = 0; i < M; i++){
+        pid_t pid = pids[i] = fork();
+        if(pid < 0){
+            handle_error("Fork greska");
+        }
+        if(pid == 0){
+            exit(max(i));
+        }
+    }
+    double max;
+    int mj;
+    if( waitpid(pids[0], &mj) < 0) {
+        handle_error("Error waiting for child");
+    }
+    max = mat[0][mj];
+    for(int i=1; i<M; i++){
+        if(waitpid(pids[i], &mj) < 0) {
+            handle_error("Error waiting for child");
+        }
+        if(mat[i][mj] > max){
+            max = mat[i][mj];
+        }
+    }
+    printf("Max: %f\n", max);
+    exit(0);
+}
+

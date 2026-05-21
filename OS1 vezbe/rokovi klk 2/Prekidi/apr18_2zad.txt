@@ -1,0 +1,40 @@
+sys_call:
+    push r0
+    push r1
+    load r0, [running]
+
+    call sys_call_proc
+
+    load r1, [running]
+    cmp r0, r1
+    jne switch
+    pop r1
+    pop r0
+    iret
+switch:
+    store r2,#offsR2[r0] ; save other regs
+    store r3,#offsR3[r0]
+    ...
+    store r31,#offsR31[r0]
+    store sp,#offsSP[r0]
+    pop r1
+    store r1,#offsR1[r0]
+    pop r1 
+    store r1,#offsR0[r0]
+    pop r1 
+    store r1,#offsPSW[r0]
+    pop r1 
+    store r1,#offsPC[r0]
+
+
+    load r0,[running]
+    load r1, #offsPC[r0] 
+    push r1
+    load r1, #offsPSW[r0]
+    push r1
+    load sp,#offsSP[r0] 
+    load r31,#offsR31[r0] 
+    ...
+    load r1,#offsR1[r0]
+    load r0,#offsR0[r0] 
+    iret

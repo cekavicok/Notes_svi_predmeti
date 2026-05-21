@@ -1,0 +1,24 @@
+void yield(){
+    asm{
+        push spc   
+        push spsw
+        push r0
+        push r1
+        ...
+        push r30
+        push r31
+        load r0, oldRunning
+        store sp, [ro + offsSp]
+        
+        ;neki poziv
+        load r0, newRunning
+        load sp, [r0 + offsSp]
+        pop r31
+        pop r30
+        ..
+        pop r1
+        pop spsw
+        pop spc
+
+    }
+}

@@ -1,0 +1,33 @@
+
+
+dispatch:
+    push r0 //stack -> sp -> psw -> pc -> ro
+    load r0, [running]
+    store r1, [r0+offsR1]
+    store r2, [r0+offsR2]
+    ...
+    store r31, [r0+offsR31]
+    pop r1
+    store r1, [r0+offsR0]
+    pop r1
+    store r1, [r0+offsPC]
+    pop r1
+    store r1, [offsPSW+r0]
+    pop r1
+    store r1, [r0+offsSP]
+
+    call scheduler
+
+    load r0, [running]
+    load r1, [r0+offsSP]
+    push r1
+    load r1, [offsPSW+r0]
+    push r1
+    load r1, [r0+offsPC]
+    push r1
+    load r31, [r0+offsR31]
+    ...
+    load r1, [r0 + offsR1]
+    load r0, [r0+offsR0]
+
+    iret

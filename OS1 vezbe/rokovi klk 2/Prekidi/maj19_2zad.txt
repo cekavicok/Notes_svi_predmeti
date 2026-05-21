@@ -1,0 +1,4 @@
+*sp = arg;
+*(sp-1) = &exit;
+pcb->sp = sp;
+pcb-pc = pf;

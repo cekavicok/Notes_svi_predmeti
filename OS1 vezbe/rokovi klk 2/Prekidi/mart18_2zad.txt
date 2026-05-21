@@ -1,0 +1,26 @@
+dispatch:
+    push r0
+    ..
+    push r31
+    load r0, running
+    store sp, [r0+savedSP]
+
+    call scheduler
+
+    load r0, running
+    load r1, [r0+timeSlice]
+    store r1, [Timer]
+    load sp, [r0+savedSp]
+    pop r31
+    ...
+    pop r0
+
+    iret
+
+//2)
+
+void scheduler() {
+    do{
+       running = processes + (running - processes + 1)% NUM_OF_PROCESSES; 
+    } while(running->status != ready);
+}

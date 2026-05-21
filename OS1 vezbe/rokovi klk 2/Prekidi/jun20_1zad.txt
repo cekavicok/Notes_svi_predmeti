@@ -1,0 +1,29 @@
+sys_call:
+    push r0
+    load r0, [running]
+    store r1, [r0+offsR1]
+    store r2, [r0+offsR2]
+    ...
+    store r31, [r0+offsR31]
+    pop r1 // r0 sa steka u r1
+    push r1 //opet se cuva
+    store r1, [r0+offsR0]
+    store SPC, [r0+offsPC]
+    store SPSW, [r0+offsPSW]
+    store SP, [r0+offsSP]
+    load r1, [r0 + offsR1]
+    pop r0
+
+    call s_call
+
+    load r0, [running]
+    load SP, #offsSP[r0] ; restore SP //MOZE I OVAKO DA SE NAPISE
+    load SPSW,#offsPSW[r0] ; restore PSW //#offset[adresa] = [adr + offs]
+    load SPC, #offsPC[r0] ; restore PC
+    load r31, #offsR31[r0] ; restore R31
+    ...
+    ; restore r30-r2
+    load r1, #offsR1[r0] ; restore R1
+    load r0, #offsR0[r0] ; restore R0
+
+    iret

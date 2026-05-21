@@ -1,0 +1,31 @@
+struct Node {
+    Node *left, *right;
+    int val;
+};
+
+
+int max(Node* nd){
+    if(!nd) return -1;
+    int curr_max = nd->val;
+
+    if(pid < 0) return -1;
+    pid_t pid = fork();
+    if(pid == 0){
+        if(nd->right){
+            int right_max = max(nd->right);
+            exit(right_max); // vr od 0-255  
+        }
+        else exit(0);
+    }
+    else {
+        int left_max = max(nd->left);
+        if(left_max > curr_max) curr_max = left_max;
+        int status;
+        waitpid(pid, &status, 0);
+        int right_max = WEXITSTATUS(status); //ili samo moze
+        waitpid(pid, &status) i upisao se why not 
+        if(right_max > curr_max) curr_max = right_max;
+    }
+    return curr_max;
+}    
+
