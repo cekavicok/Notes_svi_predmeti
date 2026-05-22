@@ -1,0 +1,26 @@
+size_t BLOCK_SIZE = ...;
+
+struct copy_task {
+    void* dst;
+    const void* src;
+    size_t num;
+}
+
+void copy_blocks(void* task){
+    copy_task* t = (copy_task*)task;
+    memcpy(t->dst, t->src, t->num);
+}
+
+void* par_memcpy (void* destination, const void* source, size_t num){
+    if(num<=0) return destination;
+    NumOfBlocks = num/BLOCK_SIZE + (num%BLOCK_SIZE > 0 ? 1 : 0);\
+    copy_task* tasks = new copy_task[NumOfBlocks];
+    for(int i=0; i<NumOfBlocks; i++){
+        tasks[i].dst = (char*)destination+i*BLOCK_SIZE;
+        tasks[i].src = (const char*)source+i*BLOCK_SIZE;
+        tasks[i].num = (i<NumOfBlocks-1 || num%BLOCK_SIZE == 0) ? BLOCK_SIZE : num%BLOCK_SIZE;
+        thread_create(&copy_block, &tasks[i]);
+    }
+    wait(NULL);
+    return dest;
+}

@@ -1,0 +1,27 @@
+extern D fun(A a, B b,C c);
+typedef void (*CallbackD)(D);
+
+struct fun_params{
+    A a;
+    B b;
+    C c;
+    CallbackD d;
+}
+
+void fun_async (A a, B b, C c, CallbackD cb){
+    fun_params* params = new fun_params;
+    params->a = a;
+    params->b = b;
+    params->c = c;
+    params->d = cb;
+    pthread_t pid;
+    pthread_create(&pid, &fun, params);
+}
+
+void fun_wrapper (void* params){
+    fun_params* p = (fun_params*)params;
+    D d = fun(p->a, p->b, p->c);
+    CallbackD callback = p->d;
+    delete p;
+    callback(d);
+}

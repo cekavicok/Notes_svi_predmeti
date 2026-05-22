@@ -1,0 +1,47 @@
+
+struct BlockHeader {
+    BlockHeader* next;
+    size_t size;
+};
+static BlockHeader* freeMemHead;
+const size_t BLOCK_SIZE = ..., MIN_BLOCK_SIZE = ...;
+void* mmap (void* addr, size_t size, int protection);
+const int PROT_RD = ..., PROT_WR = ..., PROT_RW = PROT_RD | PROT_WR;
+
+void* malloc (size_t size){
+    BlockHeader* bh = freeMemHead, *prev = nullptr;
+    while(bh || bh->size < size){
+        prev = bh;
+        bh = bh->next;
+    }
+    if(bh == nullptr){
+        //ne postoji slobodan treba da alociram
+        size_t sz = size > BLOCK_SIZE ? size : BLOCK_SIZE;
+        bh = (BlockHeader*)mmap(nullptr,sz+sizeof(BlockHeader),PROT_RW);
+        if(bh == nullptr) return nullptr; //nema nista mem
+        if(prev) prev->next = bh;
+        else freeMemHead = bh;
+        bh->next = nullptr;
+        bh->size = sz;
+    }
+
+    size_t remSize = bh->size - size;
+    if(remSize >= sizeof(BlockHeader) + MIN_BLOCK_SIZE){
+        // ostatak je dovoljno velik → splituј blok: smanji bh na size, 
+        //napravi novi slobodan blok (newBh) odmah iza
+        bh->size = size;
+        size_t offset = sizeof(BlockHeader) + size;
+        BlockHeader* newBh = (BlockHeader*)((char*)bh+offset);
+        if(prev) prev->next = newBh;
+        else freeMemHead = newBh;
+        newBh->next = bh->next;
+        newBh->size = remSize - sizeof(BlockHeader);
+    }else{
+        // ostatak premali za novi blok → alociraj ceo bh, izbaci ga iz free liste
+        if(prev) prev->next = bh->next;
+        else freeMemHead = bh->next;
+    }
+    bh->next = nullptr;
+    return (char*)bh+sizeof(BlockHeader);
+
+}

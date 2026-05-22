@@ -1,0 +1,14 @@
+const int NumOfBlocks = ...;
+int memMap[NumOfBlocks] = {NumOfBlocks};
+int alloc (int size){
+    if(size <= 0 || size > NumOfBlocks) return -1;
+    for(int i=0; i < NumOfBlocks; i++){
+        if(memMap[i] >= size){
+            if(memMap[i] > size){
+                memMap[i+size] = memMap[i] - size;
+            }
+            memMap[i] = -size;
+        }
+    }
+    return -1;
+}

@@ -1,0 +1,35 @@
+struct FreeSegment{
+    FreeSegment* next;
+    size_t size;
+}
+
+FreSegment* mem_free_head;
+
+int proc_relocate(PCB* pcb){
+    FreeSegment* curr = mem_free_head, *prev = nullptr;
+    while(curr || curr->size+(char*)curr != pcb->mem_base_addr){
+        prev = curr;
+        curr = curr->next;
+    }
+    if(curr==0 || curr->next == 0 ||
+        (char*)curr->next!=pcb->mem_base_addr+pcb->mem_size){
+            return 0;
+    }
+
+    size_t new_size = curr->size + curr->next->size;
+    FreeMem* new_next = curr->next->next;
+    memcpy(curr, pcb->mem_base_addr, pcb->mem_size);
+    pcb->mem_base_addr = curr;
+
+    if(prev){
+        prev->next = (FreeMem*)(pcb->mem_base_addr+pcb->mem_size);
+        prev->next->next = new_next;
+        prev->next->size = new_size;
+    }
+    else {
+        mem_free_head = (FreeMem*)(pcb->mem_base_addr+pcb->mem_size);
+        mem_free_head->next = new_next;
+        mem_free_head->size = new_size;
+    }
+    return 1;
+}

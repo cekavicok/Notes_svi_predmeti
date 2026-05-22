@@ -1,0 +1,24 @@
+extern uint32 freeMemBlks[];
+extern size_t BLK_SIZE;
+
+//(1)
+void getMemCtxt(PCB* pcb, uint32& base, uint32& limit){
+    base = pcb->baseBlk * BLK_SIZE;
+    limit = pcb->numOfBlocks * BLK_SIZE-1;
+}
+
+//(2)
+bool isMemBlkFree(size_t num){
+    return freeMemBlks[num/32] & (1<<(num%32));
+}
+void allocMemBlk(size_t num){
+    return freeMemBlks[num/32] &= ~(uint32)(1 <<  (num%32));
+}
+
+int expand(PCB* pcb){
+    size_t newBlk = pcb->baseBlk + pcb->numOfBlocks;
+    if(!isMemBlkFree(newBlk)) return -1;
+    allocMemBlk(newBlk);
+    pcb->numOfBlocks++;
+    return 0;
+}

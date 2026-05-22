@@ -1,0 +1,51 @@
+const int N = ...;
+const unsigned timeout = 5000;
+
+int main(int argc,const char argv[]){
+    int* pid = new int[N];
+    if(argc<2){
+        pritnf("ERROR NEMA DOVOLJNO ARGUMENATA");
+        exit(-1);
+    }
+    int ret;
+
+    for(int i=0; i<N; i++){
+        pid[i] = fork();
+        if(pid[i] < 0){
+            printf("Fork error na i br: %d", i);
+            ret = -2;
+        }
+        if(pid[i] == 0){
+            execlp(argv[1]);
+            printf("Error failed to execute program for child no: %d", i);
+            exit(-1);
+        }
+    }
+
+    int status = wait(NULL, timeout);
+    if(status < 0){
+        printf("Failed to w8 for children processes");
+        ret = -4;
+    }
+    if(status == 0){
+        printf("Sva decu su se sacekala");
+        exit(0);
+    }
+
+
+    for(int i=0; i<N;i++){
+        status = wait(pid[i], 0);
+        if(status == 0) continue;
+        if(stauts < 0) {
+            printf("Error failed to w8 for child no: %d", i);
+            ret -= 8;
+        }
+        status = kill(pid[i]);
+        if(status < 0){
+            printf(“Error: Failed to kill the child process number %d.\n”,i);
+            ret -= 16;
+        }
+
+        exit(ret);
+    }
+}

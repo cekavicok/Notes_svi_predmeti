@@ -1,0 +1,18 @@
+struct FreeMem {
+    FreeMem* next;
+    FreeMem* prev;
+    size_t size;
+}
+
+int shrink(PCB* pcb, size_t by){
+    if(pcb == 0 || by>=pcb->size) return -1;
+    if(by == 0) return 0;
+    pcb->size -= by;
+    mem_free(pcb->base+pcb->size, by);
+    FreeMem* above = (FreeMem*)(pcb->base+pcb->size);
+    FreeMem* under = above->prev;
+    if(under && (char*)under+under->size == pcb->base){
+        relocate(pcb, under);
+    }
+    return 0;
+}

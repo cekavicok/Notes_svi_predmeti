@@ -1,0 +1,37 @@
+const int N = ...;
+class Data;
+Data data[N];
+void processData(Data*);
+
+int thread_create (void (*thread_body)(void*), void* arg);
+
+typedef struct ChunkDesc{
+    int offset, size;
+}ChunkDesc;
+
+void dataProcessor(void* chunk){
+    ChunkDesc* cnk = (ChunkDesc*)chunk;
+    int end = cnk->offset+cnk->size;
+    for(int i=cnk->offset; i<end; i++)
+        processData(&data[i]);
+    delete cnk;
+}
+
+void parallelProcessing(int n){
+    //imam ukupno N data i treba da ih podelim na n
+    //imam N=20 n=3 => 20/3 = 6 (donja od 6.66) 20%3 = 2
+    chunksize = N/n;
+    int offset = 0;
+    for(int i=0; i<n; i++){
+        int myChunksize = chunksize;
+        //i = 0, N%n = 2 znaci povecacu velicinu za 1 odsecka
+        //jer bih bez toga imao premalo isecaka i ovako sam ih rasporedio
+        //na prvih N%n
+        if(i<N%n) myChunksize++;
+        ChunkDesc* chunk = new ChunkDesc;
+        chunk->offset = offset;
+        chunk->size = myChunksize;
+        offset+= myChunksize;
+        thread_create(dataProcessor, chunk);
+    }
+}

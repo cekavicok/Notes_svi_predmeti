@@ -1,0 +1,16 @@
+#include <stdio.h>
+
+char command[33];
+
+void main(){
+
+    while(1){
+        scanf("%32s", &command);
+        if(strcmp(command,"q")==0) break;
+
+        int pid = fork();
+        if(pid < 0) printf("Error fork %s. \n", command);
+        else if(pid > 0) wait(pid);
+        else execl(command);
+    }
+}
