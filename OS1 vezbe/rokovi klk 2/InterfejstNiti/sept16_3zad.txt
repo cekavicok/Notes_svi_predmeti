@@ -1,0 +1,34 @@
+const int N = ...;
+class Data;
+Data data[N];
+void processData(Data*);
+void parallelProcessing (int n);
+
+class DataProcessor extends Thread {
+    public:
+        DataProcessor(int offset, int size): size(size), (offset):offset{}
+        virtual void run();
+    private:
+        int size;
+        int offset;
+}
+
+void DataProcessor::run(){
+    int end = this->offset + this->size;
+    for(int i=this->offset; i<end; i++){
+        processData(&data[i]);
+    }
+}
+
+void parralelProcessing(int n){
+    int BlockSize = N/n;
+    int offset = 0;
+    for(int i=0; i<n; i++){
+        int thisBlockSize = BlockSize;
+        if(i < N%n) thisBlockSize++;
+        DataProcessor dp = new DataProcessor(offset, thisBlockSize);
+        dp->start();
+        offset += thisBlockSize;
+    }
+}
+

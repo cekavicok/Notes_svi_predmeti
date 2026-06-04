@@ -1,0 +1,32 @@
+
+Thread* t_fork(){
+    lock();
+    //sacuvam context
+    //sacuvam sp u jmp_buf sp
+    //napravim novu nit i stavil je u scheduler
+    //
+    
+    
+    void* dst = malloc(STACK_SIZE);
+    if(!dst){
+        throw ThreadCreationException();
+    }
+    memcpy(dst, Thread::running->stack, STACK_SIZE);
+    Thread* newRunning = new Thread();
+    if(!newRunning){
+        free(dst);
+        throw ThreadCreationException();
+    }
+    newRunning->stack = dst;
+    if(setjmp(newRunning->context) == 0){
+        //parent
+        newRunning->context->sp = newRunning->context->sp - Thread::running->context->sp + dst;
+        Scheduler::put(newRunning);
+        unlock();
+        return newRunning;
+    }else{
+        //child
+        unlock();
+        return 0;
+    }
+}

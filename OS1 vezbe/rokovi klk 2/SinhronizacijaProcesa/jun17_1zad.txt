@@ -1,0 +1,44 @@
+Barrier* blocked;
+
+class Barrier {
+public:
+    Barrier (int open=1): isOpen(open), owner(Thread::running);
+    void open();
+    void close();
+    void pass();
+private:
+    int isOpen;
+    Thread* owner;
+};
+
+void Barrier::pass(){
+    if(Thread::running != this->owner){
+        return nullptr;
+    }
+    lock();
+    if(isOpen == 0){
+        Thread::running->blocked = this;
+        if(setjmp(Thread::running->context)==0){
+            Thread::running = Scheduler::get();
+            longjmp(Thread::running->context, 1);
+        }
+    }
+    unlock();
+}
+
+void Barrier::open(){
+    lock();
+    this->isOpen = 1;
+    if(this->owner->blocked == this){
+        this->owner->blocked == 0;
+        Scheduler::put(this->owner);
+    }
+    unlock();
+}
+
+
+inline void Barrier::close(){
+    this->isOpen = 0;
+}
+
+

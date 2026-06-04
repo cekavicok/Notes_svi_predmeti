@@ -1,0 +1,15 @@
+void yield(jmp_buf old, jmp_buf new){
+    if(setjmp(old)==0){
+        longjmp(new,1);
+    }
+}
+
+void dispatch(){
+    lock();
+    jmp_buf old = Thread::running->context;
+    Scheduler::put(Thread::running);
+    Thread::running = Scheduler::get()
+    jmp_buf new = Thread::running->context;
+    yield(old, new);
+    unlock();
+}

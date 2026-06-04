@@ -1,0 +1,18 @@
+struct ProcessorPrivate(){
+    int lock_count;
+    ProcessorPrivate(): lock_count(0) {} 
+};
+
+void lock(short* lck){
+    disable_interrupts();
+    processor_private[this_processor()].lock_count++;
+    while(test_and_set(lck));
+}
+
+void unlock(short* lck){
+    *lck = 0;
+    if(--processor_private[this_processor()].lock_count == 0){
+        enable_interrupts();
+    }
+}
+

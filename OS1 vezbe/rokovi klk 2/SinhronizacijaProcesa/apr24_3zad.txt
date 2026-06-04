@@ -1,0 +1,18 @@
+class GarageController {
+public:
+    GarageController(unsigned slots){
+        mySem = new Semaphore(slots);
+    }
+    ~GarageController() {delete mySem;}
+    void entry() { mySem->wait(); }
+    void exit() { mySem->signal(); } 
+    unsigned getFreeSlots() const{
+        int n = mySem->val;
+        return(n>= 0) n : 0;
+    }
+
+
+private:
+    Semaphore* mySem;
+};
+

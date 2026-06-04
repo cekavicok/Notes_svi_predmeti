@@ -1,0 +1,44 @@
+class Mutex{
+public:
+    Mutex(): holder(0) {}
+    void wait();
+    void signal();
+private:
+    Queue blocked;
+    Thread* holder;
+};
+
+void Mutex::wait(){
+    lock();
+    if(Thread::running == holder){
+        unlock();
+        throw ERR_MUTEX;
+    }
+    if(holder == 0){
+        holder = Thread::running;
+        Scheduler::put(holder);
+    }
+    else{
+        blocked.put(Thread::running);
+    }
+    yield();
+    unlock();
+}
+
+void Mutex::signal() {
+    lock();
+    if(Thread::running != holder){
+        unlock();
+        throw ERR_MUTEX;
+    }
+    Thread* t = blocked.get();
+    holder = t;
+    if(t){
+        Scheduler::put(t);
+    }
+    yield();
+    unlock();
+}
+
+
+

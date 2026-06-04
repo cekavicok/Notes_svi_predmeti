@@ -1,0 +1,25 @@
+class SharedCoord {
+public:
+    SharedCoord();
+    void read(int& x, int& y);
+    void write(int x, int y);
+private:
+    Semaphore mutex;
+    int x, y;
+};
+
+inline SharedCoord(): mutex(1) {}
+inline void SharedCoord::read(int& x, int& y){
+    mutex.wait();
+    x = this->x;
+    y = this->y;
+    mutex.signal();
+}
+
+inline void SharedCoord::write(int x, int y){
+    mutex.wait();
+    this->x = x;
+    this->y = y;
+    mutex.signal();
+}
+

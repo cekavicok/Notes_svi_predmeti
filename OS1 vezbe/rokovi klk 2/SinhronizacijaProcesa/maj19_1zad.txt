@@ -1,0 +1,40 @@
+class Mutex{
+public:
+    Mutex(): cnt(0), holder(0), lck(0) {}    
+    void wait();
+    void signal();
+protected:
+    void block();
+    void deblock();
+private:
+    int lck, cnt;
+    Queue blocked;
+    Thread* holder;    
+}
+
+void Mutex::wait(){
+    if(holder == Thread::running){
+        cnt++
+        return 0;
+    }
+    lock(&lck);
+    if(holder) block();
+    holder = Thread::running;
+    cnt++;
+    unlock(&lck);
+    return 0;
+}
+
+void Mutex::signal(){
+    if(holder != Thread::running || cnt == 0){
+        return -1;
+    }
+    lock(&lck);
+    if(--cnt == 0){
+        holder = 0;
+        if(!blocked.isEmpty()) deblock();
+
+    }
+    unlock(&lck);
+    return 0;
+}

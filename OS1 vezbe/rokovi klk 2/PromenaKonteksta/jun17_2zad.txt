@@ -1,0 +1,60 @@
+void yield (jmp_buf oldBuf, jmp_buf newBuf) {
+    if (setjmp(oldBuf)==0) longjmp(newBuf,1);
+}
+void Thread::dispatch () {
+    lock();
+    jmp_buf oldBuf = Thread::running->context;
+    Scheduler::put(Thread::running);
+    Thread::running = Scheduler::get();
+    jmp_buf newBuf = Thread::running->context;
+    yield(oldBuf, newBuf);
+    unlock();
+}
+
+//Thread se prosiruje sa
+Thread* Thread::parent = 0;
+bool Thread::isActive = false;
+bool Thread::isWaitingForAllChildren = false;
+Thread* Thread::isWaitingForChild = 0;
+unsigned long Thread::activeChildrenCounter = 0;
+
+
+void Thread::created(Thread* parent){
+    this->parent = parent;
+    this->isActive = true
+    if(parent) this->parent->activeChildrenCounter++;
+}
+
+void Thread::completed(){
+    this->isActive = false;
+    if(!this->parent) return;
+    this->parent->activeChildrenCounter--;
+    if((this->parent->activeChildrenCounter == 0 &&
+        this->parent->isWaitingForAllChildren) ||
+           this->parent->isWaitingForChild == this ){
+            this->parent->isWaitingForAllChildren = false;
+            this->parent->isWaitingForChild = 0;
+            Scheduler::put(this->parent);
+    }
+} 
+
+void Thread::wait(Thread* forChild=0){
+    lock();
+    jmp_buf old = Thread::running->context
+    if(forChild==0){
+        if(Thread::running->activeChildrenCounter>0){
+            Thread::running->isWaitingForAllChildren = true;
+        }else{
+            Scheduler::put(Thread::running);
+        }
+    }    
+    else{
+        if(forChild->parent == Thread::running && forChild->isActive){
+            Thread::running->isWaitingForChild = forChild;
+        }else Scheduler::put(Thread::running);
+    }
+    Thread::running = Scheduler::get();
+    jmp_buf new = Thread::running->context;
+    yield(old, new);
+    unlock();
+}

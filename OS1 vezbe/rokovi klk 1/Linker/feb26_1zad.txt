@@ -1,0 +1,19 @@
+#include <fcntl.h>
+#include <sys/start.h>
+#include <stdio.h>
+
+const int N = 256;
+const int SIZE = sizeof(int)*N;
+const char* name =  "/shared_mem";
+
+int main(){
+    int shm = shm_open(name, O_CREATE|O_RDWR, ???);
+    ftruncate(shm, SIZE);
+    int* arr = (int*)mmap(0, SIZE,PROT_READ|PROT_WRITE,MAP_SHARED, shm, 0);
+    for(int i=0; i<N; i++){
+        arr[i] = i;
+    }
+    shm_unlink(shm);
+    return 0;
+}
+

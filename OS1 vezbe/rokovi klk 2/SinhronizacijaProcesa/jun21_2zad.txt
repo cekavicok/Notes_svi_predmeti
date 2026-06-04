@@ -1,0 +1,29 @@
+void Semaphore::wait(){
+    lock();
+    Thread* oldR = Thread::running;
+    if(--val >= 0){
+        Scheduler::put(oldR);
+    }
+    else{
+        this->blocked.put(oldR);
+    }
+    Thread* newR = Thread::running = Scheduler::get();
+    if(oldR != newR){
+        Thread::yield(oldR, newR);
+    }
+    unlock();
+}
+
+void Semaphore::signal(){
+    lock();
+    Thread* oldR = Thread::running;
+    if(++val <= 0){
+        Scheduler::put(this->blocked.get());
+    }
+    Scheduler::put(oldR);
+    Thread* newR = Thread::running = Scheduler::get();
+    if(oldR != newR){
+        Thread::yield(oldR, newR);
+    }
+    unlock();
+}

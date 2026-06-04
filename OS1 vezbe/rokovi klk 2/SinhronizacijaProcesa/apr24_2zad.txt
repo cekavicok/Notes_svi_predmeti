@@ -1,0 +1,58 @@
+inline void yield (Thread* oldThr, Thread* newThr) {
+    if (setjmp(oldThr->context) == 0)
+        longjmp(newThr->context, 1);
+}
+void Thread::dispatch() {
+    lock();
+    Thread* oldThr = Thread::running;
+    Scheduler::put(oldThr);
+    Thread* newThr = Thread::running = Scheduler::get();
+    yield(oldThr, newThr);
+    unlock();
+}
+
+Thread* Thread::parent = nullptr;
+bool Thread::isActive = false;
+Thread* Thread::awaitedChild = false;
+int Thread::status = 0;
+
+void Thread::created(){
+    this->parent = Thread::running;
+    this->isActive = true;
+    this->awaitedChild = nullptr;
+    this->status = 0;
+}
+
+void Thread::completed(int status){
+    this->isActive = false;
+    this->status = status;
+    if(this->parent->awaitedChild == this && this->parent){
+        this->parent->awaitedChild = nullptr;
+        Scheduler::put(this->parent);
+    }
+
+}
+
+int Thread::join(int* status = nullptr){
+    lock();
+    int ret = 0;
+    Thread* thisTr = Thread::running;
+    if(this->parent ==  thisTr){
+        if(this->isActive){
+            Thread::running->awaitedChild = child;
+        }
+        else{
+            Scheduler::put(Thread::running);
+        }
+    }
+    else{
+        ret = -1;
+        Scheduler::put(Thread::running);
+    }
+    Thread* newThr = Thread::running = Scheduler::get();
+    yield(thisThr, newThr);
+    if (ret == 0 && status)
+        *status = this->status;
+    unlock();
+    return ret;
+}

@@ -1,0 +1,16 @@
+void IOThread::suspend(){
+    IOThread::running->isReady = 0;
+    int newRunning = -1;
+    while(newRunning = -1){
+        for(int i=0; i<IOThread::NumOfThreads; i++){
+            if(IOThread::allThreads[i].isReady){
+                newRunning = i;
+                break;
+            }
+        }
+    }
+    IOThread* oldR = IOThread::running;
+    IOThread* newR = &IOThread::allThreads[newRunning];
+    IOThread::running = newR;
+    IOThread::yield(oldR, newR);
+}

@@ -1,0 +1,26 @@
+int dispatch (Thread* newT = 0){
+    lock();
+    int oldR = Thread::running;
+    if(!newT){
+        //nije zadata trazi se sledeca u nizu
+        do Thread::running = (Thread::running+1)%NumOfThreads;
+        while(!Thread::allThreads[Thread::running].isRunnable &&
+            Thread::running != oldR);
+    }
+    else{
+        //zadata je
+        if(!newT->isRunnable){
+            unlock();
+            return -1;
+        }
+        //oduzimam newT - bazaNiza jer je newT pointer i tako dobijam
+        //el niza na ovaj nacin uvek lol
+        Thread::running = newT - Thread::allThreads;
+    }
+    if(Thread::running != oldR){
+        jmp_buf oldC = Thread::allThreads[oldR].context;
+        yield(oldC, Thread::allThreads[Thread::running].context);
+    }
+    unlock();
+    return 0;
+}

@@ -1,0 +1,20 @@
+thread_local int i=0;
+void f (int id) {
+    i=id;
+    ++i;
+    std::cout<<i;
+}
+void main() {
+    i=9;
+    std::thread t1(f,1);
+    std::thread t2(f,2);
+    std::thread t3(f,3);
+    t1.join();
+    t2.join();
+    t3.join();
+    std::cout<<i<<std::endl;
+}
+//svako i je razlicito i nemaju veze jedno sa drugim :) jer svaka nit
+//pa cak i nit od main ima svoje posebno int i;
+//ISPIS
+//2349 2439 3249 3429 4329 4239

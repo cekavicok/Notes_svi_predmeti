@@ -1,0 +1,22 @@
+class Thread {
+public:
+    Thread ();
+    void start ();
+    virtual void run () {}
+};
+
+
+class ThreadFnCaller extends Thread{
+    public:
+        ThreadFnCaller(void (*fn)(void*), void* arg) : myFn(fn), myArg(arg){}
+        virtual void run() { myFn(myArg) }
+    private:
+        void(*myFn)(void*);
+        void* myArg;
+};
+
+
+for(int i=0; i<N; i++){
+    ThreadFnCaller* caller = new ThreadFnCaller(fn, args[i]);
+    caller->start();
+}

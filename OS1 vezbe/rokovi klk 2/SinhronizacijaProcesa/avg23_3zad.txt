@@ -1,0 +1,32 @@
+Data* sharedData = ...
+OptimisticCCtrl* ctrl = new OptimisticCCtrl();
+bool committed = false;
+do {
+    Data* myCopy = ctrl->startTrans(&sharedData);
+    myCopy->write(...); // Write to *myCopy
+    committed = ctrl->commit();
+} while (!committed);
+
+class OptimisticCCtrl {
+public:
+    OptimisticCCtrl();
+    Data* startTrans(Data** original);
+    bool commit();
+private:
+    Data** shared = 0, *read = 0, *copy = 0;
+};
+bool cmp_and_swap(void** shared, void* read, void* copy);
+
+
+Data* OptimisticCCtrl::startTrans(Data** original){
+    this->shared = original;
+    read = *original;
+    return copy = new Data(*read);
+}
+
+bool OptimisticCCtrl::commit(){
+    bool ret = cmp_and_swap(shared, read, copy);
+    if(!ret) delete copy;
+    return ret;
+
+}

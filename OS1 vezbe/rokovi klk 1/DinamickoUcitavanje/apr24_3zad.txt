@@ -1,0 +1,17 @@
+void read_block(size_t offset, size_t size, int* buffer);
+void write_block(size_t offset, size_t size, const int* buffer);
+void arr_add(size_t arr_size){
+    static const size_t ELEM_SIZE = 4'
+    static const size_t BLOCK_SIZE = (1<<14) / ELEM_SIZE;
+    static int a[BLOCK_SIZE], b[BLOCK_SIZE];
+    size_t block = 0, remain = arr_size;
+    while(remain > 0){
+        size_t size = (remain > BLOCK_SIZE) ? BLOCK_SIZE : remain;
+        read_block(block*BLOCK_SIZE*ELEM_SIZE, size, a);
+        read_block(arr_size*ELEM_SIZE + block*BLOCK_SIZE*ELEM_SIZE, size,b );
+        for(size_t i = 0; i < size; i++) a[i] += b[i];
+        write_block(2*arr_size*ELEM_SIZE+ block*BLOCK_SIZE*ELEM_SIZE,size, a);
+        remain = (remain > size) remain - size : 0;
+        block++;
+    }
+}

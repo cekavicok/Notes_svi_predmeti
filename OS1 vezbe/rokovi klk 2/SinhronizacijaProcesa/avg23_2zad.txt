@@ -1,0 +1,19 @@
+bool Thread::isSuspended = false;
+void Thread::suspend(){
+    lock();
+    this->isSuspended = true;
+    if(setjmp(this->context) == 0){
+        Thread::running = Scheduler::get();
+        longjmp(Thread::running->context, 1);
+    }
+    unlock();
+}
+
+void Thread::resume(){
+    lock();
+    if(this->isSuspended){
+        this->isSuspended = false;
+        Scheduler::put(this);
+    }
+    unlock();
+}

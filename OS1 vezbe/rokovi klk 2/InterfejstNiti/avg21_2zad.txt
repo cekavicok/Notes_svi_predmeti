@@ -1,0 +1,28 @@
+// Primer poziva: roditelj kreira dete i ceka na njega
+// Thread* child = new MyThread();
+// child->start();
+// child->join();  // this = child, runningThread = roditelj
+
+void Thread::wrapper (Thread* toRun) {
+    unlock();
+    toRun->run();
+    lock();
+    toRun->complete = true;
+    if(toRun->isParentWaiting){
+        toRun->isParentWaiting = false;
+        Scheduler::put(toRun->parent);
+    }
+}
+
+int Thread::join(){
+    if(!this || this->parent != Thread::runningThread) return -1;
+    if(this->complete) return 0;
+    lock();
+    this->isParentWaiting = true;
+    if(setjmp(Thread::runningThread->context)==0){
+        Thread::runningThread = Scheduler::get();
+        longjmp(Thread::runningThread->context, 1);
+    }
+    unlock();
+    return 0;
+}

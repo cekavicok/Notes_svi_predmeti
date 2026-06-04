@@ -1,0 +1,51 @@
+#include <iostream>
+void writer (char* c, int* flag) {
+    while (1) {
+        while (*flag==1);
+        cin>>(*c);
+        *flag = 1;
+}
+}
+void reader (char* c, int* flag) {
+    while (1) {
+        while (*flag==0);
+        cout<<(*c);
+        *flag = 0;
+}
+}
+void pipe () {
+    char c;
+    int flag = 0;
+    if (fork())
+        writer(&c,&flag);
+    else
+        reader(&c,&flag);
+}
+void main () {
+    pipe();
+}
+//1) treba char c i int flag = 0 da deklarisem kao static jer ovako
+//svaka nit ima svoju instancu, a static znaci da sve niti imaju zaj instancu
+
+//2)
+void pipe () {
+    static char c1;
+    static char c2;
+    static int flag1 = 0;
+    static int flag2 = 0;
+    if(fork()){
+        writer(&c1, &flag1);
+    }else{
+        if(fork()){
+            reader(&c1, &flag1);
+        }
+        else{
+            if(fork()){
+                writer(&c2, &flag2);
+            }
+            else{
+                reader(&c2, &flag2);
+            }
+        }
+    }
+}

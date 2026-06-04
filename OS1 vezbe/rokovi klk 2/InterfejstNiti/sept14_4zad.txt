@@ -1,0 +1,22 @@
+class Search : public Thread {
+public:
+    Search (int a[], int i, int j, int x) : array(a), i(i), j(j), x(x){}
+    virtual void run() { s(i, j); }
+    void s(int i, int j);
+private:
+    int* array;
+    int i,j,x;
+};
+
+void Search::s(int i, int j){
+    if(array == 0 || i<0 || j<0 || j<i) return;
+    if(i == j){
+        if(array[i] == x) printf("Found at %d\n!", i);
+        else printf("Not fount at %d!\n", i);
+        return;
+    }
+    Search* right = new Search(array, (i+j)/2+1, j, x);
+    right->start();
+    s(i, (i+j)/2);
+}
+
