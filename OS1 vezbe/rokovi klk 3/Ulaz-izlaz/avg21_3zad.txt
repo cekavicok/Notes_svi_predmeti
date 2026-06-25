@@ -1,0 +1,38 @@
+typedef unsigned int REG;
+
+REG* dmaCtrl =...; # DMA control register
+REG* dmaStatus =...; # DMA status register
+REG* dmaAddress =...; # DMA block address register
+REG* dmaCount =...; # DMA block size register
+REG* ioCtrl =...; # Input device control register
+
+extern const size_t PACKET_SIZE, BUFFER_SIZE;
+extern char packetBuffer[BUFFER_SIZE * PACKET_SIZE];
+extern char *pbHead, *pbTail;
+
+
+interrupt void packetArrived (){
+    if(pbTail == pbHead) { #full buffer
+        *ioCtrl = IO_REJECT;
+    }
+    else {
+        *dmaAddress = pbTail;
+        *dmaCount = PACKET_SIZE;
+        *dmaCtrl = DMA_START;
+    }
+}
+
+interrupt void dmaComplete () {
+    if(*dmaStatus & DMA_ERROR) {
+        *ioCtrl = IO_REJECT;
+    }
+    else {
+        *ioCtrl = IO_COMPLETE;
+        if((pbTail - packetBuffer)\PACKET_SIZE == BUFFER_SIZE-1){
+            pbTail = packetBuffer;
+        }
+        else {
+            pbTail = pbTail + PACKET_SIZE;
+        }
+    }
+}

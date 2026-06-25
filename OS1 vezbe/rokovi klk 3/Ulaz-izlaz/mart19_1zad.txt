@@ -1,0 +1,57 @@
+typedef unsigned long REG;
+REG* ioCtrl =...; // control register
+REG* ioStatus =...; // status register
+REG* ioData =...; // data register
+REG* ioBlock =...; // block address register
+const unsigned int BLOCK_SIZE = ...;
+const REG START_READING = ...;
+
+
+#NE POSTOJE PREKIDI
+#u ioCtrl <- START_READING
+#ioBlock je upisan ceo blok od BLOCK_SIZE
+#prima se ceo ne rec po rec
+#ioStatus na 1 uspeh. 
+#greska ioStatus = 0x10
+
+
+struct IORequest {
+    REG* buffer; #Data buffer (data block) in memory
+    REG block; # The block number (address)
+    int status; # Status of operation
+    IORequest* next; # Next in the list
+};
+#POLING 
+transfer (IORequest* request){
+    req->head = 0;
+    if (!ioHead){
+        ioHead = ioTail = req;
+        performIO();
+    }
+    else { #ako lista nije prazna onda se vec vrti neki zahtev
+        #while petlji 
+        ioTail = ioTail->next = req;
+    }
+}
+
+void performIO() {
+    while(ioHead) {
+        IORequest* curr = ioHead;
+        ioHead = ioHead->next;
+        if(!ioHead) ioTail = 0;
+        *ioBlock = curr->block;
+        *ioCtrl = START_READING;
+
+        while(*ioStatus&1 == 0); #cekam dok kontroler
+        #ne kaze gotovo
+        if(*ioStatus&2 == 1){
+            curr->status = -1;
+        }
+        else {
+            curr->status = 0;
+            for(int i =0; i<BLOCK_SIZE; i++){
+                curr->buffer[i] = *ioData;
+            }
+        }
+    }
+}

@@ -1,0 +1,41 @@
+typedef unsigned int REG;
+REG* ioCtrl =...; // control register
+REG* ioStatus =...; // status register
+REG* ioData =...; // data register
+const unsigned BlockSize = ...; // block size
+
+
+struct IORequest {
+    REG* buffer; # Data buffer (block)
+    int status; # Status of operation
+    IORequest* next; # Next in the list
+};
+
+static REG* ptr = 0; # pointer to current data item
+static int count = 0; # counter
+
+void pokretanje(){
+    if(!ioHead) return;
+    ptr = ioHead -> buffer; #pomocno za pomeranje
+    count = BlockSize; #prati koliko je ostalo
+
+    *ioCtrl = 1;
+}
+
+
+void transfer (){
+    pokretanje();
+}
+interrupt void ioInterrupt (){
+    if(*ioStatus & 2) ioHead->status = -1; 
+    else {
+        *ptr++ = *ioData;
+        if(--count) return;
+        #umesto count moze i
+        # if(ptr - ioHead->buffer < BlockSize) return
+        else ioHead->status =0;
+    }
+    *ioCtrl = 0;
+    ioHead = ioHead->next;
+    pokretanje();
+}

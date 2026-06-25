@@ -1,0 +1,56 @@
+typedef volatile unsigned int REG;
+REG* ioCtrl =...; #control register
+REG* ioStatus =...; # status register
+REG* ioData =...; # two data registers
+
+struct IORequest {
+    REG* buffer; // Data buffer (block)
+    unsigned int size; // Buffer (blok) size
+    int status; // Status of operation
+    IORequest* next; // Next in the list
+};
+
+static IORequest* pending[2] = {0,0};
+
+void startIO(int i){
+    if(ioHead == 0){ #zaustavljam ako nema nijedan zahtev
+        // Nema vise zahteva u listi za dodelu ovom kanalu.
+        // (1<<i) je maska sa jedinicom samo na Start bitu kanala i (npr. 01 za i=0, 10 za i=1).
+        // ~(1<<i) invertuje tu masku (sve jedinice OSIM bita i), a & sa njom resetuje
+        // (gasi) SAMO Start bit kanala i, ne dirajuci Start bit drugog kanala
+        // (koji moze biti i dalje aktivan u upravljackom registru koji je zajednicki za oba kanala).
+        *ioCtrl &= ~(1<<i);
+        pending[i] = 0; // kanal i vise nema zahtev u obradi (izaci ce iz while petlje u transfer())
+        return;
+    }
+    pending[i] = ioHead;       // kanal i preuzima prvi zahtev sa liste kao "svoj" trenutni zahtev
+    ioHead = ioHead->next;     // taj zahtev se skida sa liste (sledeci na redu je za drugi poziv startIO)
+    pending[i]->next = 0;      // ciscenje next pokazivaca, zahtev se vise ne smatra delom liste
+    *ioCtrl |= (1<<i);         // setuje SAMO Start bit kanala i na 1 (pokrece prenos), ne dirajuci drugi bit
+}
+
+void handleIO(int i){
+    if((*ioStatus & (1<<i)) == 0) return; #nije ready
+    if((*ioStatus)&(1<<(2+i))) pending[i]->status = -1;
+    else {
+        *(pending[i]->buffer)++ = ioData[i];
+        if(--pending[i]->size) return;
+        else {
+            pending[i]->status = 0;
+        } 
+        startIO(i);
+    }
+
+}
+
+void transfer(){
+    if(!ioHead) return;        // lista je prazna, nema sta da se pokrene
+    startIO(0);                 // kanal 0 preuzima 1. zahtev iz liste i pokrece prenos na njemu
+    startIO(1);                 // kanal 1 preuzima sledeci (2.) zahtev iz liste i pokrece prenos na njemu
+    while(pending[0] || pending[1]){   // dok BAR JEDAN kanal ima zahtev u obradi (uposleno cekanje/polling)
+        if(pending[0]) handleIO(0);    // ako kanal 0 ima zahtev, provери da li je spreman i opsluzi ga
+        if(pending[1]) handleIO(1);    // ako kanal 1 ima zahtev, provери da li je spreman i opsluzi ga
+    }
+    // Petlja se zavrsava kad oba kanala nemaju vise nijedan zahtev (pending[0]==0 i pending[1]==0),
+    // tj. kad je cela lista ioHead obradjena i oba kanala su zaustavljena u startIO.
+}

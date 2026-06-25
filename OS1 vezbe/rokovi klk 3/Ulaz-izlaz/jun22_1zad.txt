@@ -1,0 +1,49 @@
+typedef volatile unsigned REG;
+REG* ioStatus = ...; //status
+char* ioData = ...; //data
+
+class KeyboardBuffer {
+public:
+    KeyboardBuffer() : head(0), tail(0), count(0),
+                        mutex(1), itemAvailable(0) {}
+    char getc();
+    void putc(char c);
+private:
+    static const size_t KB_SIZE = 256;
+    char buffer[KB_SIZE];
+    size_t head, tail, count;
+    Semaphore mutex, itemAvailable;
+};
+
+static KeyboardBuffer* instance() {
+    static KeyboardBuffer _instance;
+    return &_instance;
+}
+
+char KeyboardBuffer::getc() {
+    itemAvailable.wait();
+    mutex.wait();
+    kbint_mask();
+    char c = buffer[head];
+    head = (head + 1) % KB_SIZE;
+    count--;
+    kbint_unmask();
+    mutex.signal();
+    return c;
+}
+
+void KeyboardBuffer::putc(char c){
+    if(count < KB_SIZE){
+        buffer[tail] = c;
+        tail = (tail + 1) % KB_SIZE;
+        count++;
+        itemAvailable.singal();
+    }
+}
+
+interrupt void keyb_int() {  //prekidna rutina
+    while(*ioStatus & 1){
+        KeyboardBuffer::instance()->putc(*ioData)
+    }
+}
+

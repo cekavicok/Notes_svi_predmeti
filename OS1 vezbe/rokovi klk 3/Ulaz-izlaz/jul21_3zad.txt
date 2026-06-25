@@ -1,0 +1,29 @@
+typedef volatile unsigned int REG;
+REG* ioCtrl = ...; // Input device control register
+volatile char* ioData = ...; // Input device packet buffer
+
+
+extern const size_t PACKET_SIZE, BUFFER_SIZE;
+extern char packetBuffer[BUFFER_SIZE * PACKET_SIZE];
+extern char *pbHead, *pbTail;
+
+
+interrupt void packetArrived(){
+    if(pbTail == pbHead) { #jako cudno resenje ?? 
+    #nije skroz tacno
+        *ioCtrl = IO_REJECT;
+    } else {
+        for(int i = 0; i < PACKET_SIZE; i++) {
+            pbTail[i] = ioData[i];
+        }
+        *ioCtrl = IO_COMPLETE;
+        #kruzno pomeranje
+        #jer moduo nad pokazivacima ne moze
+        if((pbTail - packetBuffer)/PACKET_SIZE == BUFFER_SIZE-1){
+            pbTail = packetBuffer;
+        }
+        else {
+            pbTail = pbTail + PACKET_SIZE;
+        }
+    }
+}

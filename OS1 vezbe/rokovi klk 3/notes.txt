@@ -1,0 +1,52 @@
+Maskiranje ->  znaci da uradim and ( & )
+
+Kad kaze kontroler -> to znaci ugl neko drugi radi valjda
+
+instance() -> posto postoji samo jedan neki objekat i onda
+da bi se osiguralo da jedan te isti poziva nesto pravi se 
+instance
+
+Polling je uposleno cekanje bukvalno!!! 
+
+pending fora zadaci maj19, 
+
+
+Pomeranje *pbTail pokazivaca kruzno
+==================================================
+
+Pretpostavke:
+- PACKET_SIZE = 4 (svaki paket je 4 bajta)
+- BUFFER_SIZE = 3 (bafer ima mesta za 3 paketa)
+- packetBuffer je niz od 3 * 4 = 12 bajtova, na adresama 1000 do 1011
+
+Slotovi:
+  Slot 0: 1000-1003
+  Slot 1: 1004-1007
+  Slot 2: 1008-1011
+
+Primer 1: pbTail na slotu 1 (nije poslednji)
+---------------------------------------------
+pbTail = 1004 (pokazuje na slot 1)
+
+Provera:
+  (pbTail - packetBuffer) / PACKET_SIZE = (1004 - 1000) / 4 = 1
+  1 != BUFFER_SIZE - 1 (=2)  -> uslov NIJE ispunjen -> else granu
+
+  pbTail = pbTail + PACKET_SIZE = 1004 + 4 = 1008
+
+Rezultat: pbTail pokazuje na slot 2 (sledeci slot).
+
+Primer 2: pbTail na poslednjem slotu (slot 2)
+------------------------------------------------
+pbTail = 1008 (pokazuje na slot 2, poslednji slot jer BUFFER_SIZE = 3 -> slotovi 0,1,2)
+
+Provera:
+  (pbTail - packetBuffer) / PACKET_SIZE = (1008 - 1000) / 4 = 2
+  2 == BUFFER_SIZE - 1 (=2)  -> uslov JESTE ispunjen -> if granu
+
+  pbTail = packetBuffer = 1000
+
+Rezultat: pbTail se vraca na slot 0 (kruzno omotavanje na pocetak bafera).
+
+____________________________________________________________________________________
+

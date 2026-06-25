@@ -1,0 +1,43 @@
+typedef unsigned int REG;
+REG* dmaCtrl =...; #DMA control register
+REG* dmaStatus =...; #DMA status register
+REG* dmaAddress =...; #DMA block address register
+REG* dmaCount =...; #DMA block size register
+
+struct IORequest {
+    REG* buffer; #Data buffer (block)
+    unsigned int size; #Buffer (blok) size
+    int status; #Status of operation
+    IORequest* next; #Next in the list
+};
+
+extern IORequest* ioHead;
+IORequest* pending = 0;
+
+int startDma(){
+    pending = ioHead; #prvi u listi ide na izvrsavanje
+    #a pocetak se postavlja na next
+    if(pending == 0) return 0;
+    ioHead = ioHead->next;
+    *dmaAdress = pending->buffer;
+}
+
+void transfer (){
+    startDma();
+    *dmaCtrl = 1;
+    #*dmaCtrl |= 1;      // setuj Start bit, ostavi ostale bitove
+    #*dmaCtrl &= ~1;     // resetuj Start bit, ostavi ostale bitove
+}
+
+
+interrupt void dmaInterrupt (){
+    if(pending == 0) return;
+    if(*dmaStatus & 2) pending->status = -1;
+    else pending->status = 0;
+    if(startDma() == 0) {
+        *dmaCtrl = 0;
+        return;
+    }
+}
+
+

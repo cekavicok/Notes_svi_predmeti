@@ -1,0 +1,41 @@
+typedef volatile unsigned int REG;
+REG* io1Ctrl =...; # Device 1 control register
+REG* io1Status =...; # Device 1 status register
+REG* io1Data =...; # Device 1 data register
+REG* io2Ctrl =...; # Device 2 control register
+REG* io2Status =...; # Device 2 status register
+REG* io2Data =...; # Device 2 data register
+
+static REG* ioPtr = 0;
+static int ioCount = 0;
+static int ioCompleted = 0;
+
+void transfer(int count) {
+    REG* buffer = new REG[count];
+    ioPtr = buffer;
+    ioCount = count;
+    *io1Ctrl = 1;
+    while(ioCount > 0) {
+        while(!(*io1Status&1)); #polling
+        #ili ti uposleno cekanje
+        #dok status prvog nije spreman tj 1
+        *ioPtr++ = *io1Data;
+        ioCount--;
+    }
+    *io1Ctrl = 0;
+
+    ioPtr = buffer;
+    ioCount = count;
+    ioCompleted = 0
+    *io2Ctrl = 1;
+    while(!ioCompleted);
+    delete[] buffer;
+}
+
+interrupt void io2Interrupt() {
+    *io2Data = *ioPtr++;
+    if(--ioCount == 0){
+        ioCompleted = 1;
+        *io2Ctrl = 0;
+    }
+}
