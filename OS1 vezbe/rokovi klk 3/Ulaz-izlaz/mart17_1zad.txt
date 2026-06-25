@@ -1,0 +1,13 @@
+typedef unsigned int REG;
+REG* ioCtrl =...; # control register
+REG* ioStatus =...; # status register
+REG* ioData =...; # data register
+const unsigned int BLOCK_SIZE = ...;
+const REG START_SENDING = ..., END_SENDING = ...;
+
+
+struct IORequest {
+    REG* buffer; # Data buffer (data block)
+    int status; # Status of operation
+    IORequest* next; # Next in the list
+};

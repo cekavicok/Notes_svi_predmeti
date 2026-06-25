@@ -1,0 +1,47 @@
+typedef unsigned REG;
+REG* io1Ctrl =...; # bit 0 start
+REG* io1Data =...; # Device 1 data register
+REG* io1Stat =...; # Device 1 status register
+
+REG* io2Ctrl =...; # Device 2 control register
+REG* io2Data =...; # Device 2 data register
+REG* io2Stat =...; # Device 2 status register
+
+REG* timer =...; # 5ms od operacije *io1ctrl = 1
+
+#uredjaj 1 je spreman posle 50ms sig
+#uredjaj 2 stavlja u *io2Stat = 1;
+
+static const unsigned timeout = 50;
+static unsigned *io1Ptr = 0, *io2Prt = 0;
+static int io1Count = 1, io2Count = 0;
+
+void transfer (unsigned* blk1, int count1, unsigned* blk2, int count2){
+
+    #proces 1, prebacen na prekidnu rutinu kako pise u zadatku
+    io1Ptr = blk1;
+    io1Count =count1;
+    *io1Ctrl = 1;
+    *timer = timeout;
+
+    #proces dva paralelno ovde
+    io2Ptr = blk2;
+    *io2Ctrl = 1;
+    io2Count = count2;
+    for(int i = coutn2; i>0; i--){
+        while((*io2Stat&1) == 0);
+        *io2Ptr = *io2Data;
+    }
+    *io2Ctrl = 0;
+}
+
+interrupt void timerInterrupt() {
+    *io1Ptr++ = *io1Data;
+    if (--io1Count){
+        *timer = timeout;
+    }
+    else *io1Ctrol = 0;
+}
+
+
+

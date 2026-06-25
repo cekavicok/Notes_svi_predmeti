@@ -50,3 +50,8 @@ Rezultat: pbTail se vraca na slot 0 (kruzno omotavanje na pocetak bafera).
 
 ____________________________________________________________________________________
 
+
+
+
+=>ZA PONOVITI:
+  ->jun19_1zad 

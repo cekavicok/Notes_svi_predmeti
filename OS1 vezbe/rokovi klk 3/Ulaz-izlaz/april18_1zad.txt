@@ -1,0 +1,66 @@
+typedef unsigned int REG;
+
+#ulazni uredjaji
+REG* io1Ctrl =...; #ovde je bit start kojim se pokrece uredjaj i zaustavlaj
+REG* io1Status =...; # ready bit kad je spreman podatak
+REG* io1Data =...; # Device 1 data register
+#uredjaj dva generise prekid kada je spreman
+REG* io2Ctrl =...; # Device 2 control register
+REG* io2Status =...; # Device 2 status register
+REG* io2Data =...; # Device 2 data register
+
+#izlazni uredjaji
+REG* io3Ctrl =...; # Device 3 control register
+REG* io3Status =...; # Device 3 status register
+REG* io3Data =...; # Device 3 data register
+
+REG* io4Ctrl =...; # Device 4 control register
+REG* io4Status =...; # Device 4 status register
+REG* io4Data =...; # Device 4 data register
+
+
+# 1->3
+# 2->4
+#mnogo los tekst treba zarez
+const REG ESC = 0;
+bool complete = false;
+
+
+void transfer() {
+    REG data = ESC;
+
+    *io1Ctrl = 1;
+    *io2Ctrl = 1;
+    *io3Ctrl = 1;
+    *io4Ctrl = 1;
+
+    while(!complete){
+        while((*io1Status&1) == 0);
+        data = *io1Data;
+        if(data == ESC) break;
+        while((*io3Status&1) == 0);
+        *io3Data = data;
+    }
+
+    complete = true;
+    *io1Ctrl = 0;
+    *io2Ctrl = 0;
+    *io3Ctrl = 0;
+    *io4Ctrl = 0;
+}
+
+interrupt void dva(){
+    if(complete) return;
+    REG data = *io2Data;
+    if(data!=ESC){
+        while((*io4Status&1) == 0);
+        *io4Data = data;
+    } else{
+        complete = true;
+        *io1Ctrl = 0;
+        *io2Ctrl = 0;
+        *io3Ctrl = 0;
+        *io4Ctrl = 0;
+    }
+
+}
