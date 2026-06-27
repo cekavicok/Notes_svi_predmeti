@@ -10,6 +10,12 @@ Polling je uposleno cekanje bukvalno!!!
 
 pending fora zadaci maj19, 
 
+->Heshiranje:
+  x = hash(blk)
+  y = map[x];
+  idem kroz listu if(blk == entries[y].blkNo)
+  ako nema nista u map[x] onda ubacim 
+ 
 
 Pomeranje *pbTail pokazivaca kruzno
 ==================================================
@@ -36,22 +42,13 @@ Provera:
 
 Rezultat: pbTail pokazuje na slot 2 (sledeci slot).
 
-Primer 2: pbTail na poslednjem slotu (slot 2)
-------------------------------------------------
-pbTail = 1008 (pokazuje na slot 2, poslednji slot jer BUFFER_SIZE = 3 -> slotovi 0,1,2)
-
-Provera:
-  (pbTail - packetBuffer) / PACKET_SIZE = (1008 - 1000) / 4 = 2
-  2 == BUFFER_SIZE - 1 (=2)  -> uslov JESTE ispunjen -> if granu
-
-  pbTail = packetBuffer = 1000
-
-Rezultat: pbTail se vraca na slot 0 (kruzno omotavanje na pocetak bafera).
-
-____________________________________________________________________________________
-
 
 
 
 =>ZA PONOVITI:
   ->jun19_1zad 
+
+
+
+
+

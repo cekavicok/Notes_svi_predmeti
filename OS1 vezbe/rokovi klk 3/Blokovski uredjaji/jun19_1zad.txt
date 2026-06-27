@@ -1,0 +1,34 @@
+typedef char byte; // Unit of memory
+typedef long long BlkNo; // Device block number
+void ioRead (int device, BlkNo blk, byte* buffer);
+
+class BlockIOCache {
+public:
+    BlockIOCache (int device) : dev(device), numOfBlocks(0) {}
+    void read (BlkNo blk, byte* buffer, size_t offset, size_t sz);
+private:
+    static const unsigned BLKSIZE = ...; # Block size in Bytes
+    static const unsigned CACHESIZE = ...; # Cache size in blocks
+    int dev;
+    byte cache [CACHESIZE][BLKSIZE]; # Cache
+    BlkNo cacheMap [CACHESIZE]; # Contents of the cache (block numbers)
+    int numOfBlocks; # Number of used entries (blocks in the cache)
+};
+
+void BlockIOCache::read(BlkNo blk, byte* buffer, size_t offset, size_t sz){
+    int entry = -1;
+    for(int i=0; i<this->numOfBlocks && entry<0; i++)
+        if(this->cacheMap[i]==blk) entry = i;
+    if(entry < 0) {
+        if(this->numOfBlocks<CACHESIZE) entry = this->numOfBlocks++;
+        else {
+        entry = this->toReplace++;
+        this->toReplace = this->toReplace%CACHESIZE;
+        }
+    this->cacheMap[entry] = blk;
+    ioRead(this->dev, blk, this->cache[entry]);
+    }
+    for(size_t j=0; j<sz && offset+j<BLKSIZE; j++)
+        buffer[j] = this->cache[entry][offset+j];
+}
+

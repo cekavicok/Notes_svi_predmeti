@@ -1,0 +1,39 @@
+struct DiskRequest {
+    uint32 blockCount;
+    uint32 startBlockNo;
+    uint32* buffer;
+    enum Dir : uint32 {in = 0, out = 1};
+    Dir dir;
+};
+
+class DiskDeviceDriver : public IBlockDeviceDriver {
+public:
+    virtual int init(Semaphore* complete);
+    virtual void startTransfer(DiskRequest *);
+private:
+    Semaphore* semComplete;
+    uint32* dmaCtrlRegion; #mora uint32* da bi mogao da uradim offset 4 to je fora lol
+    friend void transferComplete(void *);
+}
+
+int DiskDeviceDriver::init(Semaphore* complete){
+    semComplete = complete;
+    dmaCtrlRegion = requestDMAChannel();
+    if(!dmaCtrlRegion) return -1;
+    uint32 ivte = requestIVTEntry(transferComplete, this);
+    if(ivte < 0) return -1l
+    *(dmaCtrlRegion + 0) = ivte;
+    return 0;
+}
+
+void DiskDeviceDriver::startTransfer(DiskRequest* req){
+    *(dmaCtrlRegion + 1) = req->buffer;
+    *(dmaCtrlRegion + 1) = req->startBlockNo;
+    *(dmaCtrlRegion + 1) = req->blockCount;
+    *(dmaCtrlRegion + 1) = req->dir;
+
+}
+
+interrupt void transferComplete(void * obj) {
+    ((DiskDeviceDriver*)obj)->semComplete -> signal();
+}

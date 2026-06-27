@@ -1,0 +1,3 @@
+void readBlock(char * addr){
+    for(int i=0; i<BlockSize; i++) addr[i] = getchar();
+}

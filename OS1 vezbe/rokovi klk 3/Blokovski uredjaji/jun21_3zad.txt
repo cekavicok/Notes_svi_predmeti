@@ -1,0 +1,47 @@
+void ioRead(int device, BlkNo blk, Byte* buffer);
+typedef unsigned char Byte; // Unit of memory
+typedef long long BlkNo; // Device block number
+const unsigned BLKSIZE = ...; // Block size in Bytes
+
+class BlockIOCache {
+public:
+    BlockIOCache(int device);
+    Byte* getBlock(BlkNo blk);
+    ...
+protected:
+    static int hash(BlkNo);
+    void evict();
+    private:
+    static const unsigned CACHESIZE = ...; // Cache size in blocks
+    static const unsigned MAPSIZE = ...; // Hash map size in entries
+    struct CacheEntry {
+        BlkNo blkNo;
+        int next;
+        int refCounter;
+        Byte buf[BLKSIZE];
+    };
+    int dev;
+    int map[MAPSIZE]; 
+    CacheEntry entries[CACHESIZE]; 
+    int freeHead; 
+};
+
+Byte* BlockIOCache::getBlock(BlkNo blk){
+    int entry = hash(blk);
+    for(int i = map[entry]; i != -1; i = entries[i].next) {
+        if(entries[i].blkNo == blk) {
+            entries[i].refCounter++;
+            return entries[i].buf;
+        }
+    }
+    if(freeHead == -1) evict();
+    if(freeHead == -1) return 0;
+    int free = freeHead;
+    freeHead = entries[freeHead].next;
+    entries[free].blkNo = blk;
+    entries[free].refCounter = 1;
+    entries[free].next = map[entry];
+    map[entry] = free;
+    ioRead(dev, blk, entries[free], buf);
+    return entries[free].buf;
+}

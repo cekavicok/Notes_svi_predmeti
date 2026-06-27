@@ -11,3 +11,21 @@ struct IORequest {
     int status; # Status of operation
     IORequest* next; # Next in the list
 };
+
+
+void performIO () {
+    while (ioHead!=0) {
+        IORequest* ioPending = ioHead; // Take the first request,
+        ioHead = ioHead->next; // remove it from the list,
+        if (ioHead==0) ioTail = 0;
+        *ioCtrl = START_SENDING; // and send it to I/O
+        for (int i=0; i<BLOCK_SIZE; i++)
+            *ioData = ioPending->buffer[i];
+        *ioCtrl = END_SENDING;
+        while (*ioStatus&1 == 0); // Wait for completion
+        if (*ioStatus&2) // Error in I/O
+        ioPending->status = -1;
+        else
+        ioPending->status = 0;
+    } 
+}
